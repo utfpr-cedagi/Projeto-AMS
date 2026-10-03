@@ -4,8 +4,8 @@
 #
 # O que este script faz (pode rodar quantas vezes quiser):
 #   1. Confere se o Python 3.12+ está instalado
-#   2. Cria o ambiente virtual .venv
-#   3. Instala os pacotes do requirements.txt e o pacote do projeto
+#   2. Confere se o uv está instalado
+#   3. Sincroniza dependências e cria o ambiente virtual .venv (uv sync)
 #   4. Prepara o arquivo .env (a partir do .env.example)
 #   5. Roda a verificação final de ambiente
 #
@@ -191,88 +191,37 @@ if (-not $pythonExe) {
 $versaoInstalada = & $pythonExe -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
 Write-Host "Python encontrado: $versaoInstalada ($pythonExe)"
 
-# --- 2. Ambiente virtual ---------------------------------------------
-Escrever-Titulo "2 de 5: ambiente virtual (.venv)"
-$pythonVenv = Join-Path $Raiz '.venv\Scripts\python.exe'
-# A .venv guarda caminhos absolutos: copiada ou movida de outra pasta (o
-# conselho quando o caminho era longo), ela parece existir mas não funciona.
-# A marca registra onde esta .venv nasceu; sem marca ou em outra pasta,
-# recria. A marca só é gravada no fim da instalação dos pacotes, então uma
-# .venv que parou no meio também é recriada na próxima rodada.
-$marcaVenv = Join-Path $Raiz '.venv\ams-pasta-de-origem.txt'
-$venvValida = (Test-Path $pythonVenv) -and (Test-Path $marcaVenv) -and
-    ((Get-Content $marcaVenv -Raw).Trim() -eq $Raiz)
-if ($venvValida) {
-    Write-Host "O ambiente virtual já existe — reutilizando (nada recriado)."
-} else {
-    if (Test-Path (Join-Path $Raiz '.venv')) {
-        Write-Host "Há uma .venv incompleta ou vinda de outra pasta — apagando para recriar..."
-        try {
-            Remove-Item -Recurse -Force (Join-Path $Raiz '.venv') -ErrorAction Stop
-        } catch {
-            Write-Host "ERRO: não consegui apagar a pasta .venv (algum programa está usando)." -ForegroundColor Red
-            Write-Host "Feche o VS Code, o Jupyter e outros terminais, apague a pasta .venv"
-            Write-Host "pelo Explorer e rode este script de novo."
-            exit 1
-        }
-    }
-    Write-Host "Criando ambiente virtual em .venv (leva ~30 segundos)..."
-    $criacao = cmd /c "`"$pythonExe`" -m venv .venv 2>&1"
-    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pythonVenv)) {
-        Write-Host "ERRO: não consegui criar o ambiente virtual." -ForegroundColor Red
-        if (($criacao | Out-String) -match "Access is denied|WinError 5") {
-            Write-Host "A PASTA NÃO PERMITE ESCRITA. Causa comum: o projeto foi executado de"
-            Write-Host "dentro do .zip (aberto no navegador) ou extraído em local protegido."
-            Write-Host "O que fazer: extraia o projeto em C:\CEDAGI\D1 e rode este script de novo."
-        } else {
-            Write-Host "Saída do comando para anexar ao pedido de ajuda:"
-            Write-Host (($criacao | Out-String).Trim())
-            Write-Host "Feche o PowerShell, abra de novo e tente outra vez; se persistir,"
-            Write-Host "anexe este erro e escreva para a coordenação antes da aula."
-        }
-        exit 1
-    }
-    Write-Host "Ambiente virtual criado."
-}
-
-# --- 3. Pacotes -------------------------------------------------------
-Escrever-Titulo "3 de 5: instalando pacotes do requirements.txt"
-# requirements.txt: o passo inteiro depende dele; pyproject.toml + src/ams/
-# __init__.py: o 'pip install -e .' que dá o 'import ams' depende dos dois.
-Exigir-ArquivoDoPacote @('requirements.txt', 'pyproject.toml', 'src\ams\__init__.py')
-Write-Host "Baixando numpy, pandas e cia. — na primeira vez são uns 2 minutos..."
-
-$atualizar = Rodar-Pip @("install", "--upgrade", "pip", "--quiet")
-if ($atualizar.Codigo -ne 0) {
-    Write-Host "ERRO: não consegui atualizar o pip." -ForegroundColor Red
-    Write-Host (Traduzir-ErroPip $atualizar.Texto)
-    exit 1
-}
-
-$instalar = Rodar-Pip @("install", "-r", "requirements.txt")
-if ($instalar.Codigo -ne 0) {
-    Write-Host "ERRO: a instalação dos pacotes falhou." -ForegroundColor Red
-    Write-Host (Traduzir-ErroPip $instalar.Texto)
-    Write-Host ""
-    Write-Host "Rode este script de novo após resolver; ele retoma de onde parou."
-    exit 1
-}
-Write-Host "Pacotes instalados (ou já estavam instalados)."
-Set-Content -Path $marcaVenv -Value $Raiz -Encoding ASCII
-
-# O próprio projeto é um pacote (pyproject.toml): instalá-lo em modo editável
-# deixa `import ams` funcionar em qualquer lugar da venv. --no-deps porque as
-# dependências já vieram do requirements.txt (e sem rede o pip não resolveria).
-if (Test-Path (Join-Path $Raiz 'pyproject.toml')) {
-    $editavel = Rodar-Pip @("install", "-e", ".", "--no-deps", "--quiet")
-    if ($editavel.Codigo -eq 0) {
-        Write-Host "Pacote do projeto instalado em modo editável (import ams)."
+# --- 2. uv (gerenciador de projeto) ----------------------------------
+Escrever-Titulo "2 de 5: procurando uv"
+try {
+    $uvVersao = & cmd /c "uv --version 2>&1"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "uv encontrado: $uvVersao"
     } else {
-        Write-Host "Aviso: pip install -e . relatou (últimas linhas):"
-        Write-Host (($editavel.Texto -split "`r?`n") | Select-Object -Last 4)
-        Instalar-PacotePorAtalho
+        throw "uv não encontrado"
     }
+} catch {
+    Write-Host "ERRO: uv não está instalado nesta máquina." -ForegroundColor Red
+    Write-Host ""
+    Write-Host "O que fazer:"
+    Write-Host "  1. Instale o uv: https://docs.astral.sh/uv/getting-started/installation/"
+    Write-Host "     (Recomendado: instale via Cargo ou o instalador oficial)"
+    Write-Host "  2. Feche e reabra o PowerShell"
+    Write-Host "  3. Rode este script de novo"
+    exit 1
 }
+
+# --- 3. Ambiente virtual e sincronização de dependências ---------------
+Escrever-Titulo "3 de 5: sincronizando dependências (uv sync)"
+$synced = & cmd /c "uv sync 2>&1"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERRO: a sincronização de dependências falhou." -ForegroundColor Red
+    Write-Host (Traduzir-ErroPip $synced)
+    exit 1
+}
+Write-Host "Dependências sincronizadas — ambiente virtual pronto."
+
+$pythonVenv = Join-Path $Raiz '.venv\Scripts\python.exe'
 
 # --- 4. Arquivo .env ---------------------------------------------------
 Escrever-Titulo "4 de 5: arquivo de configuração (.env)"

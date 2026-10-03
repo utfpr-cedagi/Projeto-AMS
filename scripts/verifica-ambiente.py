@@ -39,7 +39,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 RAIZ = Path(__file__).resolve().parent.parent
 
-# Pacotes exigidos pelo requirements.txt: (nome de import, nome no PyPI).
+# Pacotes exigidos pelo pyproject.toml (definidos com versões em uv.lock): (nome de import, nome no PyPI).
 PACOTES = [
     ("pydantic", "pydantic"),
     ("numpy", "numpy"),
@@ -143,7 +143,7 @@ def verificar_venv() -> Resultado:
 
 
 def verificar_pacote(nome_import: str, nome_pypi: str) -> Resultado:
-    """Confere se um pacote do requirements.txt está instalado e importável.
+    """Confere se um pacote do pyproject.toml está instalado e importável.
 
     Importar pode falhar por dois motivos MUITO diferentes: o pacote não está
     instalado, ou está instalado mas não carrega (típico de caminho de pasta
@@ -167,7 +167,8 @@ def verificar_pacote(nome_import: str, nome_pypi: str) -> Resultado:
                 f"Pacote '{nome_pypi}'",
                 False,
                 "não instalado",
-                "com a venv ativa, rode: python -m pip install -r requirements.txt",
+                "rode o script de setup novamente (bash scripts/setup-unix.sh ou "
+                "powershell -ExecutionPolicy Bypass -File scripts\\setup-windows.ps1)",
             )
     try:
         versao = importlib.metadata.version(nome_pypi)

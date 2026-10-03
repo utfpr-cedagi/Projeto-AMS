@@ -5,8 +5,8 @@
 #
 # O que este script faz (pode rodar quantas vezes quiser):
 #   1. Confere se o Python 3.12+ está instalado
-#   2. Cria o ambiente virtual .venv
-#   3. Instala os pacotes do requirements.txt e o pacote do projeto
+#   2. Confere se o uv está instalado
+#   3. Sincroniza dependências e cria o ambiente virtual .venv (uv sync)
 #   4. Prepara o arquivo .env (a partir do .env.example)
 #   5. Roda a verificação final de ambiente
 #
@@ -99,84 +99,39 @@ fi
 read -ra COMANDO_PYTHON <<< "$PYTHON"
 echo "Python encontrado: $("${COMANDO_PYTHON[@]}" --version) (comando: $PYTHON)"
 
-# --- 2. Ambiente virtual ---------------------------------------------
-titulo "2 de 5: ambiente virtual (.venv)"
-if [ -f ".venv/bin/python" ] || [ -f ".venv/Scripts/python.exe" ]; then
-    echo "O ambiente virtual já existe — reutilizando (nada recriado)."
+# --- 2. uv (gerenciador de projeto) ----------------------------------
+titulo "2 de 5: procurando uv"
+if command -v uv >/dev/null 2>&1; then
+    uv_versao=$(uv --version)
+    echo "uv encontrado: $uv_versao"
 else
-    echo "Criando ambiente virtual em .venv (leva ~30 segundos)..."
-    codigo_venv=0
-    saida_venv="$("${COMANDO_PYTHON[@]}" -m venv .venv 2>&1)" || codigo_venv=$?
-    if [ "$codigo_venv" -ne 0 ]; then
-        echo "ERRO: não consegui criar o ambiente virtual."
-        if echo "$saida_venv" | grep -qi "permission denied\|read-only\|operation not permitted"; then
-            echo ""
-            echo "A PASTA NÃO PERMITE ESCRITA. Causa comum: o projeto foi executado de"
-            echo "dentro do .zip (aberto no navegador) ou extraído em local protegido."
-            echo "O que fazer: extraia o projeto para uma pasta comum da sua pasta"
-            echo "de usuário e rode este script de novo."
-        else
-            echo ""
-            echo "Saída do comando para anexar ao pedido de ajuda:"
-            echo "$saida_venv" | tail -n 6
-            echo "Feche o terminal, abra de novo e tente outra vez; se persistir,"
-            echo "anexe este erro e escreva para a coordenação antes da aula."
-        fi
-        exit 1
-    fi
-    echo "Ambiente virtual criado."
+    echo "ERRO: uv não está instalado nesta máquina."
+    echo ""
+    echo "O que fazer:"
+    echo "  1. Instale o uv: https://docs.astral.sh/uv/getting-started/installation/"
+    echo "     (macOS: 'curl -LsSf https://astral.sh/uv/install.sh | sh')"
+    echo "     (Linux: use o gerenciador de pacotes ou o curl acima)"
+    echo "  2. Feche e reabra o terminal"
+    echo "  3. Rode este script de novo"
+    exit 1
 fi
-# Linux/macOS usam .venv/bin; no Git Bash do Windows a venv criada pelo
-# python.exe usa .venv/Scripts — os dois casos levam ao mesmo python da venv.
-if [ -x ".venv/bin/python" ]; then
+
+# --- 3. Ambiente virtual e sincronização de dependências ---------------
+titulo "3 de 5: sincronizando dependências (uv sync)"
+codigo=0
+saida="$(uv sync 2>&1)" || codigo=$?
+if [ "$codigo" -ne 0 ]; then
+    echo "ERRO: a sincronização de dependências falhou."
+    traduzir_erro_pip "$saida"
+    exit 1
+fi
+echo "Dependências sincronizadas — ambiente virtual pronto."
+
+# Determinar caminho do python da venv
+if [ -f ".venv/bin/python" ]; then
     PYTHON_VENV=".venv/bin/python"
 else
     PYTHON_VENV=".venv/Scripts/python.exe"
-fi
-
-# --- 3. Pacotes -------------------------------------------------------
-titulo "3 de 5: instalando pacotes do requirements.txt"
-# requirements.txt: o passo inteiro depende dele; pyproject.toml + src/ams/
-# __init__.py: o 'pip install -e .' que dá o 'import ams' depende dos dois.
-exigir_arquivo "requirements.txt" "pyproject.toml" "src/ams/__init__.py"
-echo "Baixando numpy, pandas e cia. — na primeira vez são uns 2 minutos..."
-
-codigo=0
-saida="$("$PYTHON_VENV" -m pip install --upgrade pip --quiet 2>&1)" || codigo=$?
-if [ "$codigo" -ne 0 ]; then
-    echo "ERRO: não consegui atualizar o pip."
-    traduzir_erro_pip "$saida"
-    exit 1
-fi
-
-codigo=0
-saida="$("$PYTHON_VENV" -m pip install -r requirements.txt 2>&1)" || codigo=$?
-if [ "$codigo" -ne 0 ]; then
-    echo "ERRO: a instalação dos pacotes falhou."
-    traduzir_erro_pip "$saida"
-    exit 1
-fi
-echo "Pacotes instalados (ou já estavam instalados)."
-
-# O próprio projeto é um pacote (pyproject.toml): instalá-lo em modo editável
-# deixa 'import ams' funcionar em qualquer lugar da venv. --no-deps porque as
-# dependências já vieram do requirements.txt (e sem rede o pip não resolveria).
-codigo=0
-saida="$("$PYTHON_VENV" -m pip install -e . --no-deps --quiet 2>&1)" || codigo=$?
-if [ "$codigo" -eq 0 ]; then
-    echo "Pacote do projeto instalado em modo editável (import ams)."
-else
-    # Plano B (equivalente ao atalho do setup-windows.ps1): registrar a pasta
-    # src no caminho de pacotes da venv via .pth — mesmo efeito prático.
-    site_packages="$("$PYTHON_VENV" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
-    if printf '%s\n' "$RAIZ/src" > "$site_packages/_ams_src.pth" 2>/dev/null; then
-        echo "Aviso: o pip não conseguiu instalar o pacote editável (motivo no log acima)."
-        echo "Registrei um atalho equivalente: import ams funciona normalmente."
-    else
-        echo "Aviso: não consegui instalar o pacote do projeto (import ams pode falhar)."
-        echo "Últimas linhas do pip para anexar ao pedido de ajuda:"
-        echo "$saida" | tail -n 4
-    fi
 fi
 
 # --- 4. Arquivo .env ---------------------------------------------------

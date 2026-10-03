@@ -39,11 +39,11 @@ máquina antes da intervenção. A decisão final é do técnico — o sistema a
 
 ## Como instalar
 
-Python 3.12 ou mais novo e uma chave gratuita do Gemini
-(<https://aistudio.google.com>, sem cartão de crédito) colada no `.env`
-(copie do `.env.example`; o `.env` fica fora do Git). O script abaixo cria o
-ambiente virtual, instala as dependências com versões fixadas e roda a
-verificação de ambiente — em Windows:
+Python 3.12 ou mais novo, [`uv`](https://docs.astral.sh/uv/) e uma chave gratuita
+do Gemini (<https://aistudio.google.com>, sem cartão de crédito) colada no `.env`
+(copie do `.env.example`; o `.env` fica fora do Git). O script abaixo sincroniza
+as dependências com versões fixadas, cria o ambiente virtual e roda a verificação
+de ambiente — em Windows:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
@@ -73,8 +73,8 @@ validação, mesmo log. O detalhe de cada avaliação fica em
 
 ```
 ├── dominio.md             # o problema, a decisão, os dados e o usuário
-├── pyproject.toml         # pacote instalável "ams" + config de ruff/pytest
-├── requirements.txt       # versões fixadas — fonte da verdade das dependências
+├── pyproject.toml         # pacote instalável "ams" + dependências com versões fixadas + config de ruff/pytest
+├── uv.lock                # lockfile — garante reprodutibilidade (gerado por `uv sync`)
 ├── scripts/               # setup, diagnóstico, download e verificação de entrega
 ├── src/ams/               # o pacote
 ├── notebooks/             # exploração dos dados
