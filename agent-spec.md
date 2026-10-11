@@ -1,0 +1,278 @@
+# agent-spec.md — AMS · Assistente de Manutenção Segura
+
+<!--
+Este arquivo é para preencher, não para ler e devolver. As perguntas de cada
+seção estão em comentário como este: elas não aparecem na pré-visualização,
+aparecem no editor. Responda ABAIXO de cada seção, apagando nada delas.
+
+As seções que ainda não foram vistas em aula ficam de pé, com a linha
+"quando se preenche" dizendo o encontro em que isso acontece. O documento
+cresce a cada laboratório — o de hoje é o primeiro.
+
+Preencha com exemplos concretos do SEU domínio. Uma linha que funcionaria
+para qualquer empresa é uma linha genérica — o exemplo do seu segmento
+(agente-spec-exemplo.pdf, no mesmo pacote) mostra o contraste.
+-->
+
+**Domínio:** AMS · Assistente de Manutenção Segura
+**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-09
+
+---
+
+## 1. PEAS
+
+<!-- Perguntas que guiam o preenchimento:
+  - Performance: o que conta como sucesso, em uma fórmula? Sobre o quê se
+    conta, sobre qual conjunto, quanto é sucesso? Qual termo impede a
+    trapaça mais óbvia (fechar rápido sem resolver)?
+  - Environment: onde o agente opera? O que existe lá — sistemas, pessoas,
+    documentos, ruído? Cite elementos concretos.
+  - Actuators: o que o agente pode FAZER? Inclua comunicar e escalar:
+    informar a decisão é uma ação, e passar adiante também é.
+  - Sensors: o que o agente consegue PERCEBER? Só o que ele enxerga existe
+    para ele.
+  Um PEAS que menciona tecnologia de solução (banco vetorial, nome de modelo)
+  está descrevendo a solução — o PEAS descreve o problema.
+-->
+**Quando se preenche:** no Laboratório 01, hoje. Refinado na Atividade Orientada.
+
+**Performance:**
+<!-- [a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso] -->
+
+| Intenção | Medida Opoeracional |
+|---|---|
+| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto"** = máquinas de risco alto classificadas como alto ÷ total de máquinas de risco alto no conjunto de avaliação. </br> </br> **Precisão da classe "alto"** = classificadas como alto que são de fato alto ÷ total classificado como alto. </br> </br> *Para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* |
+
+**Environment:**
+
+<!-- [onde o agente opera, com elementos concretos — sistemas, pessoas, documentos, ruído] -->
+ Planta Industrial, Máquinas de Produção, Ordens de Serviço, Equipe de Manutenção com técnicos de manutenção, supervisores de segurança.
+
+**Actuators:**
+
+<!-- [o que o agente pode fazer — inclua comunicar e escalar] -->
+Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. 
+
+**Sensors:**
+
+<!-- [o que o agente consegue perceber — só o que ele enxerga existe para ele] -->
+
+Máquinas, Sensores, historico de falhas, Normals Regulamentares em PDF, Descritivo nas ordens de serviços.
+
+---
+
+## 2. O ambiente em sete dimensões
+
+<!--
+Perguntas que guiam o preenchimento (uma por dimensão):
+  - Observabilidade: existe algo que muda a decisão e o agente não mede?
+  - Número de agentes: existe alguém cujas ações mudam o seu resultado?
+    Um humano que reage ao agente conta.
+  - Determinismo: a mesma ação no mesmo estado dá sempre o mesmo efeito?
+  - Episódico ou sequencial: a decisão de agora afeta as decisões seguintes?
+  - Estático ou dinâmico: o ambiente muda enquanto o agente delibera?
+  - Discreto ou contínuo: estados e ações são contáveis?
+  - Conhecido ou desconhecido: o agente sabe de antemão as regras? (Trata do
+    que ele SABE, não do que ele VÊ.)
+  Cada classificação vem com uma frase de justificativa — a etiqueta sozinha
+  não vale nada.
+-->
+**Quando se preenche:** no Laboratório 02, no sábado (encontro 2).
+
+[uma linha por dimensão: a classificação e a frase de
+justificativa — começando por observabilidade e determinismo]
+
+**Domínio:** AMS · Assistente de Manutenção Segura
+
+| Dimensão | Minha classificação | Justificativa (uma frase) | Consequências |
+|---|---|---|---|
+| Observabilidade | parcial | As linhas no dataset, possuem registro dos sensores necessários para avaliar o risco de falha, mas no dataset nao existe atualmente as descriçoes das ordens de serviço e essa informação é necessária para o agente consultar as NR. | **Precisa** de Estado interno; memória e contexto. |
+| Número de agentes | único | Um agente especialista que indique a possibilidade iminente de falha na máquina. | **Não precisa** de Protocolo de comunicação e previsão do outro. |
+| Determinismo | determinístico | Deve ser necessario um modelo de linguagem para definicao de NR. | **Não precisa** de Valor esperado, nova tentativa, tempo máximo. |
+| Episódico ou sequencial | episódico | Periodicamente um novo dataset deverá ser informado para o agente avaliar a condição de cada maquina e possibilidade de falha iminente, baseado nos estados dos sensores. | **Não precisa** de Planejamento e avaliação de trajetória inteira. |
+| Estático ou dinâmico | estático | Como o agente vai atuar em um dataset recebido periodicamente, considero que isso definie essa dimensao como estática. | **Não precisa** de Prazo de resposta e resposta parcial aceitável. |
+| Discreto ou contínuo | discreto | O agente vai trazer uma informação que que indica se existe uma possibilidade de falha iminente e tambem indicar procedimentos para manutencao. | **Não precisa** de Discretização declarada, com granularidade justificada. |
+| Conhecido ou desconhecido | desconhecido | Não existe documentação disponível. | **Precisa** de Fase de exploração e registro do que se aprendeu. |
+
+
+
+---
+
+## 3. Tipo de agente pretendido
+
+<!--
+Perguntas que guiam o preenchimento:
+  - O tipo mais simples que resolve: reativo simples, baseado em modelo,
+    baseado em objetivos, baseado em utilidade, ou um deles com aprendizagem?
+  - A caracterização do ambiente (seção 2) é que decide — parcialmente
+    observável elimina o reativo simples.
+  - Justifique com a dimensão do ambiente que obriga a escolha.
+-->
+**Quando se preenche:** no sábado (encontro 2, manhã).
+
+[o tipo mais simples que resolve, justificado pela dimensão
+do ambiente que o obriga]
+
+---
+
+## 4. Medida de desempenho
+
+<!--
+Perguntas que guiam o preenchimento:
+  - A fórmula do campo Performance, agora em definição operacional: como se
+    calcula, passo a passo, sem ambiguidade?
+  - Métrica primária e duas secundárias. As secundárias pegam o que a
+    primária deixa passar (custo, latência, reabertura).
+  - O conjunto de casos: de onde vêm, quantos são, de que período.
+  - O limiar de sucesso e o valor de hoje.
+-->
+**Quando se preenche:** a fórmula começa no Laboratório 01; a definição
+operacional completa — primária, secundárias, conjunto e limiar — é item da
+Atividade Orientada.
+
+[métrica primária e duas secundárias, cada uma com: como se
+calcula, sobre qual conjunto, qual o limiar de sucesso e o
+valor de hoje]
+
+#### **Métrica primária — Recall da classe "alto"**
+**Como se calcula:** máquinas de risco alto classificadas como alto dividido pelo total de máquinas de risco alto.
+
+**Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
+
+**Limiar de sucesso**: maior ou igual a 80%. Valor definido inicialmente, o qual poderá ser ajustado ao receber uma definição clara sobre isso.
+
+**Valor de hoje**: não medido.
+
+#### **Métrica Secundária 1 — Precisão da classe "alto"**
+**Como se calcula:** quantidade de máquinas classificadas como alto que são de fato alto dividio pelo total classificado como alto.
+
+
+**Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
+
+**Limiar de sucesso:** maior ou igual a 80%. Valor definido inicialmente, o qual poderá ser ajustado ao receber uma definição clara sobre isso. 
+
+**Valor de hoje**: não medido.
+
+#### **Secundária 2 — Taxa de erro classificados com baixo e deveria ser alto**
+**Como se calcula:** máquinas de risco alto classificadas como baixo dividido pelo total de máquinas de risco alto.
+
+**Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
+
+**Limiar de sucesso:** menor ou igual a 5%. Valor definido inicialmente, o qual poderá ser ajustado ao receber uma definição clara sobre isso. 
+
+**Valor de hoje**: não medido.
+
+---
+
+## 5. Restrições
+
+<!--
+Perguntas que guiam o preenchimento:
+  - Latência aceitável: a partir de quantos segundos a resposta perde valor?
+  - Custo aceitável: quanto pode custar cada resolução?
+  - O que o agente jamais pode fazer: a ação irreversível que ele não executa
+    sozinho. Esta linha vira política em D12.
+  - A troca que você aceita: quanto de qualidade por quanto de custo?
+    Um exemplo numérico vale mais que a fórmula.
+-->
+**Quando se preenche:** na Atividade Orientada.
+
+[latência aceitável, custo aceitável, o que o agente jamais
+pode fazer sozinho, e a troca qualidade × custo que você
+aceita — com um exemplo numérico]
+
+---
+
+## 6. Catálogo de ações
+
+<!--
+Perguntas que guiam o preenchimento:
+  - Para cada ação: nome, entrada, saída, é reversível?, qual o risco se
+    errar? As quatro colunas são obrigatórias — "baixo" não é descrição de
+    risco.
+  - Ações de leitura E de escrita: as que alteram o mundo são as que exigem
+    cuidado, e são justamente as que mais ficam de fora.
+  - Este catálogo é, literalmente, a lista de ferramentas que você vai
+    implementar em D10.
+-->
+**Quando se preenche:** na Atividade Orientada — o pacote `D2-07` traz o
+modelo da tabela e dois exemplos preenchidos.
+
+[tabela: nome · entrada · saída · é reversível? · risco se
+errar — ações de leitura e de escrita]
+
+---
+
+## 7. Formulação por busca
+
+<!--
+Perguntas que guiam o preenchimento:
+  - Qual fatia do problema é um espaço de estados? (Nem toda fatia é — e
+    reconhecer a que não é vale tanto quanto formular a que é.)
+  - Os cinco componentes: estado inicial, ações, modelo de transição, teste
+    de objetivo, custo de caminho. Comece pelo teste de objetivo.
+  - O estado descreve a SITUAÇÃO, não a história de como se chegou nela.
+-->
+**Quando se preenche:** no Laboratório 03, sábado à tarde (encontro 2).
+
+```
+(ams) PS C:\temp\UTFPR\Projeto-AMS> uv run .\D02\D2-03-formular-como-busca\verificar-formulacao.py         
+verificar-formulacao — teste de sanidade da formulação de busca
+(sem argumentos: rodando sobre o catálogo — aponte o seu com arquivo.py:ATRIBUTO)
+
+— diagnostico.PEQUENA
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+— diagnostico.MAIOR
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+— consultas.PEQUENA
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+— consultas.MAIOR
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+— conformidade.PEQUENA
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+— conformidade.MAIOR
+  1. estado é hashable ✅
+  2. transição é função ✅
+  3. ações estáveis na ordem ✅
+  4. custo é positivo ou zero ✅
+  5. objetivo é alcançável ✅
+  6. estado não guarda o caminho ✅
+  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
+
+Seis verificações verdes — a formulação pode ir para o agent-spec.md e para o lab-04.
+```
