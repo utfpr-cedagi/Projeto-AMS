@@ -1,0 +1,162 @@
+"""Subproblema 2 do catálogo: a sequência de consultas para responder uma pergunta.
+
+A formulação vem do plano da D2, seção 9 (catálogo de subproblemas):
+Estado: o que já se sabe. Ação: consultar uma fonte. Custo: latência da
+consulta. Objetivo: ter todos os dados que a resposta exige.
+
+O sabor do caso: uma fonte costuma entregar VÁRIOS fatos de uma vez. O
+caminho ótimo pode ser uma fonte cara que fecha tudo, ou duas baratas que
+juntas fecham — e é exatamente esse tipo de escolha que a busca compara.
+Uma consulta repetida (todos os fatos já sabidos) é permitida, custa a
+latência inteira e não muda o estado: a busca em grafo a descarta.
+
+Os dados são inventados e moram nas constantes do módulo — troque pelos do
+seu domínio (lab-03) sem tocar na classe.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Fonte:
+    """Uma fonte que pode ser consultada, e o que ela entrega."""
+
+    nome: str
+    latencia: float              # custo da consulta (segundos)
+    fornece: tuple[str, ...]     # os fatos que a consulta devolve
+
+# A pergunta: "Quantas maquinas estão disponíveis para uso, considerando a
+# manutenção programada?" — quatro fatos, cinco fontes. O caminho ótimo é a
+# combinação de fontes baratas; a fonte única (Administrativo) é a mais cara.
+FATOS_PEQUENOS: frozenset[str] = frozenset({
+    "qtde de maquinas totais",
+    "qtde de maquinas em manutenção",
+    "qtde de maquinas disponíveis",
+    "maquinas com manutenção programada",
+})
+
+FONTES_PEQUENAS: tuple[Fonte, ...] = (
+    Fonte("Depto Producao — Qtde Máquinas", 1.2, ("qtde de maquinas disponíveis",)),
+    Fonte("Depto Manutenção", 2.0, ("qtde de maquinas em manutenção", "maquinas com manutenção programada")),
+    Fonte("Depto Compras", 6.0, ("qtde de maquinas totais",)),
+    Fonte("relatório semanal da produção", 4.5, ("qtde de maquinas totais",
+                                                  "qtde de maquinas disponíveis")),
+    Fonte("Depto Administrativo", 15.0, ("qtde de maquinas totais",
+                                         "qtde de maquinas em manutenção",
+                                         "qtde de maquinas disponíveis",
+                                         "maquinas com manutenção programada")),
+)
+
+# A pergunta maior: "a produção programada poderá ser atendida neste
+# período?" — oito fatos, catorze fontes. A maioria das fontes é barata e
+# específica; só a consultoria externa cobre tudo de uma vez, por um preço
+# bem mais alto do que combinar as fontes baratas.
+FATOS_MAIORES: frozenset[str] = frozenset({
+    "qtde de pecas vendidas no período",
+    "qtde de pecas produzidas por maquina",
+    "qtde de pecas produzidas por dia",
+    "qtde de dias até o final do período",
+    "qtde total de pecas esperadas no período",
+    "qtde de maquinas disponíveis para produção",
+    "qtde de insumos em estoque",
+    "prazo de entrega do fornecedor de insumos",
+})
+FONTES_MAIORES: tuple[Fonte, ...] = (
+    Fonte("ERP — pedidos do período", 0.9, ("qtde de pecas vendidas no período",)),
+    Fonte("painel de capacidade da fábrica", 1.1, ("qtde de pecas produzidas por maquina",)),
+    Fonte("apontamento de produção diário", 1.3, ("qtde de pecas produzidas por dia",)),
+    Fonte("calendário de produção", 0.7, ("qtde de dias até o final do período",)),
+    Fonte("sistema de manutenção — máquinas disponíveis", 1.0, ("qtde de maquinas disponíveis para produção",)),
+    Fonte("WMS — estoque de insumos", 1.2, ("qtde de insumos em estoque",)),
+    Fonte("portal do fornecedor", 3.5, ("prazo de entrega do fornecedor de insumos",)),
+    Fonte("robô de email do PCP", 2.8, ("qtde de insumos em estoque",
+                                        "prazo de entrega do fornecedor de insumos")),
+    Fonte("planejamento de vendas e operações (S&OP)", 4.0, ("qtde de pecas vendidas no período",
+                                                              "qtde total de pecas esperadas no período")),
+    Fonte("relatório de capacidade instalada", 5.0, ("qtde de pecas produzidas por maquina",
+                                                      "qtde de maquinas disponíveis para produção")),
+    Fonte("painel do PCP", 6.5, ("qtde de pecas produzidas por dia",
+                                 "qtde de dias até o final do período",
+                                 "qtde total de pecas esperadas no período")),
+    Fonte("ERP — módulo de planejamento completo", 9.0, ("qtde de pecas vendidas no período",
+                                                          "qtde total de pecas esperadas no período",
+                                                          "qtde de dias até o final do período")),
+    Fonte("reunião com gestor de produção", 14.0, ("qtde de pecas produzidas por maquina",
+                                                    "qtde de pecas produzidas por dia",
+                                                    "qtde de maquinas disponíveis para produção",
+                                                    "qtde de insumos em estoque",
+                                                    "prazo de entrega do fornecedor de insumos")),
+    Fonte("consultoria externa de capacidade", 22.0, ("qtde de pecas vendidas no período",
+                                                       "qtde de pecas produzidas por maquina",
+                                                       "qtde de pecas produzidas por dia",
+                                                       "qtde de dias até o final do período",
+                                                       "qtde total de pecas esperadas no período",
+                                                       "qtde de maquinas disponíveis para produção",
+                                                       "qtde de insumos em estoque",
+                                                       "prazo de entrega do fornecedor de insumos")),
+)
+
+class Consultas:
+    """O problema de busca: que fontes consultar, em que ordem.
+
+    O estado é o conjunto de fatos já sabidos, como tupla ordenada —
+    estados com os mesmos fatos são o mesmo hash, não importa a ordem
+    das consultas.
+    """
+
+    def __init__(self, fatos_necessarios: frozenset[str], fontes: tuple[Fonte, ...]):
+        self.fatos_necessarios = fatos_necessarios
+        self.fontes = fontes
+        self._por_nome = {f.nome: f for f in fontes}
+        self.estado_inicial: tuple[str, ...] = ()
+
+    def acoes(self, estado: tuple[str, ...]) -> list[str]:
+        return [f.nome for f in self.fontes]
+
+    def transicao(self, estado: tuple[str, ...], acao: str) -> tuple[str, ...]:
+        # o estado é um CONJUNTO de fatos: consultar fonte que só repete o
+        # que já se sabe devolve o MESMO estado — sem o set(), cada consulta
+        # redundante criaria um estado novo com o fato duplicado.
+        return tuple(sorted(set(estado) | set(self._por_nome[acao].fornece)))
+
+    def objetivo(self, estado: tuple[str, ...]) -> bool:
+        return self.fatos_necessarios.issubset(estado)
+
+    def custo(self, estado: tuple[str, ...], acao: str, estado_seguinte: tuple[str, ...]) -> float:
+        return self._por_nome[acao].latencia
+
+    def heuristica_admissivel(self, estado: tuple[str, ...]) -> float:
+        """A latência da consulta mais barata que ainda entrega um fato faltante.
+
+        Admissível: enquanto faltar fato, é obrigatório consultar PELO MENOS
+        uma fonte que ajude — e nenhuma consulta custa menos do que a menor
+        latência útil. Ignora quantas consultas ainda virão depois dessa.
+        """
+        sabidos = set(estado)
+        faltantes = self.fatos_necessarios - sabidos
+        if not faltantes:
+            return 0.0
+        uteis = [f.latencia for f in self.fontes
+                 if set(f.fornece) & faltantes]
+        return min(uteis)
+
+    def heuristica_inadmissivel(self, estado: tuple[str, ...]) -> float:
+        """Pior caso por fato: cada fato que falta vai custar a consulta mais lenta.
+
+        NÃO é admissível, e é tentadora por isso: "cada dado que falta é uma
+        consulta, e consulta pode demorar o máximo" é o cálculo pessimista
+        que se escreve de primeira. Ela ignora que uma consulta única entrega
+        vários fatos — e por isso faz a fonte cara que resolve tudo parecer
+        o caminho mais promissor: o A* com ela mergulha na consulta lenta e
+        devolve caminho mais caro que o ótimo (o lab-05 mede o dano).
+        """
+        sabidos = set(estado)
+        faltantes = len(self.fatos_necessarios - sabidos)
+        pior_latencia = max(f.latencia for f in self.fontes)
+        return float(faltantes * pior_latencia)
+
+
+PEQUENA = Consultas(FATOS_PEQUENOS, FONTES_PEQUENAS)
+MAIOR = Consultas(FATOS_MAIORES, FONTES_MAIORES)

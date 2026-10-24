@@ -95,8 +95,9 @@ class Fonte:
 
 
 
-# A pergunta: "Quantas maquinas estão disponíveis para uso, considerando a manutenção programada?" 
-# — quatro fatos, quatro fontes.
+# A pergunta: "Quantas maquinas estão disponíveis para uso, considerando a
+# manutenção programada?" — quatro fatos, cinco fontes. O caminho ótimo é a
+# combinação de fontes baratas; a fonte única (Administrativo) é a mais cara.
 FATOS_PEQUENOS: frozenset[str] = frozenset({
     "qtde de maquinas totais",
     "qtde de maquinas em manutenção",
@@ -105,34 +106,64 @@ FATOS_PEQUENOS: frozenset[str] = frozenset({
 })
 
 FONTES_PEQUENAS: tuple[Fonte, ...] = (
-    Fonte("Depto Producao — Qtde Máquinas", 1.2, ("qtde de maquinas disponíveis")),
-    Fonte("Depto Manutenção", 2.0, ("qtde de maquinas em manutenção","maquinas com manutenção programada")),
+    Fonte("Depto Producao — Qtde Máquinas", 1.2, ("qtde de maquinas disponíveis",)),
+    Fonte("Depto Manutenção", 2.0, ("qtde de maquinas em manutenção", "maquinas com manutenção programada")),
     Fonte("Depto Compras", 6.0, ("qtde de maquinas totais",)),
+    Fonte("relatório semanal da produção", 4.5, ("qtde de maquinas totais",
+                                                  "qtde de maquinas disponíveis")),
     Fonte("Depto Administrativo", 15.0, ("qtde de maquinas totais",
                                          "qtde de maquinas em manutenção",
                                          "qtde de maquinas disponíveis",
                                          "maquinas com manutenção programada")),
 )
 
-# A pergunta maior: "A producao programada poderá ser atendida neste período?" — oito
-# fatos, e nenhuma fonte cobre tudo sozinha.
+# A pergunta maior: "a produção programada poderá ser atendida neste
+# período?" — oito fatos, catorze fontes. A maioria das fontes é barata e
+# específica; só a consultoria externa cobre tudo de uma vez, por um preço
+# bem mais alto do que combinar as fontes baratas.
 FATOS_MAIORES: frozenset[str] = frozenset({
+    "qtde de pecas vendidas no período",
     "qtde de pecas produzidas por maquina",
-    "qtde de pecas em estoque",
-    "qtde de pecas produizdas por dia",
+    "qtde de pecas produzidas por dia",
     "qtde de dias até o final do período",
-    "qtde total de pecas esperadas no período"
+    "qtde total de pecas esperadas no período",
+    "qtde de maquinas disponíveis para produção",
+    "qtde de insumos em estoque",
+    "prazo de entrega do fornecedor de insumos",
 })
 FONTES_MAIORES: tuple[Fonte, ...] = (
-    Fonte("ERP — Plano de Producao", 0.8, ("qtde total de pecas esperadas no período",
-                                          "qtde de dias até o final do período",
-                                          "qtde de pecas produzidas por dia",
-                                          "qtde de pecas produzidas por maquina")),
-    Fonte("capacidade de produção", 1.1, ("qtde de pecas produzidas por dia",
-                                          "qtde de pecas produzidas por maquina",
-                                          "qtde de dias até o final do período")),
-    Fonte("saldo de pecasfaltantes a serem produzidas", 0.9, ("qtde de dias até o final do período",
-                                                     "qtde de pecas produzidas por dia",)),
+    Fonte("ERP — pedidos do período", 0.9, ("qtde de pecas vendidas no período",)),
+    Fonte("painel de capacidade da fábrica", 1.1, ("qtde de pecas produzidas por maquina",)),
+    Fonte("apontamento de produção diário", 1.3, ("qtde de pecas produzidas por dia",)),
+    Fonte("calendário de produção", 0.7, ("qtde de dias até o final do período",)),
+    Fonte("sistema de manutenção — máquinas disponíveis", 1.0, ("qtde de maquinas disponíveis para produção",)),
+    Fonte("WMS — estoque de insumos", 1.2, ("qtde de insumos em estoque",)),
+    Fonte("portal do fornecedor", 3.5, ("prazo de entrega do fornecedor de insumos",)),
+    Fonte("robô de email do PCP", 2.8, ("qtde de insumos em estoque",
+                                        "prazo de entrega do fornecedor de insumos")),
+    Fonte("planejamento de vendas e operações (S&OP)", 4.0, ("qtde de pecas vendidas no período",
+                                                              "qtde total de pecas esperadas no período")),
+    Fonte("relatório de capacidade instalada", 5.0, ("qtde de pecas produzidas por maquina",
+                                                      "qtde de maquinas disponíveis para produção")),
+    Fonte("painel do PCP", 6.5, ("qtde de pecas produzidas por dia",
+                                 "qtde de dias até o final do período",
+                                 "qtde total de pecas esperadas no período")),
+    Fonte("ERP — módulo de planejamento completo", 9.0, ("qtde de pecas vendidas no período",
+                                                          "qtde total de pecas esperadas no período",
+                                                          "qtde de dias até o final do período")),
+    Fonte("reunião com gestor de produção", 14.0, ("qtde de pecas produzidas por maquina",
+                                                    "qtde de pecas produzidas por dia",
+                                                    "qtde de maquinas disponíveis para produção",
+                                                    "qtde de insumos em estoque",
+                                                    "prazo de entrega do fornecedor de insumos")),
+    Fonte("consultoria externa de capacidade", 22.0, ("qtde de pecas vendidas no período",
+                                                       "qtde de pecas produzidas por maquina",
+                                                       "qtde de pecas produzidas por dia",
+                                                       "qtde de dias até o final do período",
+                                                       "qtde total de pecas esperadas no período",
+                                                       "qtde de maquinas disponíveis para produção",
+                                                       "qtde de insumos em estoque",
+                                                       "prazo de entrega do fornecedor de insumos")),
 )
 
 class Consultas:

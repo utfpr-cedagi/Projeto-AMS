@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** AMS · Assistente de Manutenção Segura
-**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-09
+**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-24
 
 ---
 
@@ -51,7 +51,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 **Actuators:**
 
 <!-- [o que o agente pode fazer — inclua comunicar e escalar] -->
-Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. 
+Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. Escalar a ordem para o supervisor de segurança quando o risco for alto ou a classificação for incerta (baixa confiança do modelo).
 
 **Sensors:**
 
@@ -181,6 +181,53 @@ Perguntas que guiam o preenchimento:
 pode fazer sozinho, e a troca qualidade × custo que você
 aceita — com um exemplo numérico]
 
+> 🔶🔶🔶 ANOTAÇÃO DO CLAUDE — APAGUE ESTE BLOCO (ATÉ O MARCADOR DE FECHAMENTO
+> ABAIXO) ANTES DE ENVIAR O ARQUIVO PRO PROFESSOR. Não é conteúdo do curso —
+> é só um sinalizador pra você achar rápido o que foi inserido agora. 🔶🔶🔶
+
+**Latência aceitável:** até 3–5 segundos por ordem — o `dominio.md`
+caracteriza o usuário como "técnico com pouco tempo entre uma ordem e
+outra"; acima disso a resposta deixa de caber no fluxo de trabalho.
+
+**Custo aceitável:** o custo real medido por ordem (`llm.py`, preços de
+referência US$0,10/US$0,40 por 1M tokens de entrada/saída) fica da ordem
+de US$0,0001 por ordem — muito abaixo de qualquer limiar que valeria a
+pena formalizar; o teto proposto é R$ 0,05 por ordem, com folga grande.
+
+**O que o agente jamais pode fazer sozinho:** liberar uma máquina pra
+operar sem bloqueio/etiquetagem (LOTO) quando a classificação de risco for
+"alto" — mesmo com alta confiança do modelo. Consistente com
+`dominio.md`: "a decisão final continua sendo do técnico."
+
+**A troca qualidade × custo — função de utilidade:**
+
+```
+U(lote) = w_Q·Qualidade − w_C·Custo − w_L·Latência − w_R·Risco
+```
+
+| Termo | O que é no AMS | De onde vem |
+|---|---|---|
+| Qualidade | Recall da classe "alto" (métrica primária, §4) | medido sobre o lote avaliado |
+| Custo | custo em R$ do lote (chamadas ao LLM) | `custo_usd` de `llm.py::_registrar`, convertido |
+| Latência | segundos até a resposta, média do lote | `latencia_ms/1000`, logado em `log.py` |
+| Risco | custo esperado do erro irreversível: P(falso negativo em "alto") × custo de um acidente | P(...) é a Secundária 2 do §4 |
+
+Pesos ilustrativos e exemplo numérico (com os números reais medidos no
+lab-06): `w_Q=R$1.000`, `w_C=5`, `w_L=R$2/s`, `w_R=R$500.000` (ordem de
+grandeza de um acidente grave — valor ilustrativo, não atuarial); com
+recall=0,625, custo≈US$0,00011, latência≈0,8s, P(falso negativo
+alto)=0,25:
+
+```
+U = 1000×0,625 − 5×0,00011 − 2×0,8 − 500000×0,25 ≈ R$ −124.377
+```
+
+O resultado negativo, dominado pelo termo de risco, é o comportamento
+esperado de um peso alto nesse termo: nenhum ganho de qualidade, custo ou
+latência compensa um erro irreversível.
+
+🔶🔶🔶 FIM DA ANOTAÇÃO DO CLAUDE — apague até aqui 🔶🔶🔶
+
 ---
 
 ## 6. Catálogo de ações
@@ -215,8 +262,179 @@ Perguntas que guiam o preenchimento:
 -->
 **Quando se preenche:** no Laboratório 03, sábado à tarde (encontro 2).
 
+**Classe modificada:**
+
+*consultdas_ams.py*
+
+```python
+"""Subproblema 2 do catálogo: a sequência de consultas para responder uma pergunta.
+
+A formulação vem do plano da D2, seção 9 (catálogo de subproblemas):
+Estado: o que já se sabe. Ação: consultar uma fonte. Custo: latência da
+consulta. Objetivo: ter todos os dados que a resposta exige.
+
+O sabor do caso: uma fonte costuma entregar VÁRIOS fatos de uma vez. O
+caminho ótimo pode ser uma fonte cara que fecha tudo, ou duas baratas que
+juntas fecham — e é exatamente esse tipo de escolha que a busca compara.
+Uma consulta repetida (todos os fatos já sabidos) é permitida, custa a
+latência inteira e não muda o estado: a busca em grafo a descarta.
+
+Os dados são inventados e moram nas constantes do módulo — troque pelos do
+seu domínio (lab-03) sem tocar na classe.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Fonte:
+    """Uma fonte que pode ser consultada, e o que ela entrega."""
+
+    nome: str
+    latencia: float              # custo da consulta (segundos)
+    fornece: tuple[str, ...]     # os fatos que a consulta devolve
+
+# A pergunta: "Quantas maquinas estão disponíveis para uso, considerando a
+# manutenção programada?" — quatro fatos, cinco fontes. O caminho ótimo é a
+# combinação de fontes baratas; a fonte única (Administrativo) é a mais cara.
+FATOS_PEQUENOS: frozenset[str] = frozenset({
+    "qtde de maquinas totais",
+    "qtde de maquinas em manutenção",
+    "qtde de maquinas disponíveis",
+    "maquinas com manutenção programada",
+})
+
+FONTES_PEQUENAS: tuple[Fonte, ...] = (
+    Fonte("Depto Producao — Qtde Máquinas", 1.2, ("qtde de maquinas disponíveis",)),
+    Fonte("Depto Manutenção", 2.0, ("qtde de maquinas em manutenção", "maquinas com manutenção programada")),
+    Fonte("Depto Compras", 6.0, ("qtde de maquinas totais",)),
+    Fonte("relatório semanal da produção", 4.5, ("qtde de maquinas totais",
+                                                  "qtde de maquinas disponíveis")),
+    Fonte("Depto Administrativo", 15.0, ("qtde de maquinas totais",
+                                         "qtde de maquinas em manutenção",
+                                         "qtde de maquinas disponíveis",
+                                         "maquinas com manutenção programada")),
+)
+
+# A pergunta maior: "a produção programada poderá ser atendida neste
+# período?" — oito fatos, catorze fontes. A maioria das fontes é barata e
+# específica; só a consultoria externa cobre tudo de uma vez, por um preço
+# bem mais alto do que combinar as fontes baratas.
+FATOS_MAIORES: frozenset[str] = frozenset({
+    "qtde de pecas vendidas no período",
+    "qtde de pecas produzidas por maquina",
+    "qtde de pecas produzidas por dia",
+    "qtde de dias até o final do período",
+    "qtde total de pecas esperadas no período",
+    "qtde de maquinas disponíveis para produção",
+    "qtde de insumos em estoque",
+    "prazo de entrega do fornecedor de insumos",
+})
+FONTES_MAIORES: tuple[Fonte, ...] = (
+    Fonte("ERP — pedidos do período", 0.9, ("qtde de pecas vendidas no período",)),
+    Fonte("painel de capacidade da fábrica", 1.1, ("qtde de pecas produzidas por maquina",)),
+    Fonte("apontamento de produção diário", 1.3, ("qtde de pecas produzidas por dia",)),
+    Fonte("calendário de produção", 0.7, ("qtde de dias até o final do período",)),
+    Fonte("sistema de manutenção — máquinas disponíveis", 1.0, ("qtde de maquinas disponíveis para produção",)),
+    Fonte("WMS — estoque de insumos", 1.2, ("qtde de insumos em estoque",)),
+    Fonte("portal do fornecedor", 3.5, ("prazo de entrega do fornecedor de insumos",)),
+    Fonte("robô de email do PCP", 2.8, ("qtde de insumos em estoque",
+                                        "prazo de entrega do fornecedor de insumos")),
+    Fonte("planejamento de vendas e operações (S&OP)", 4.0, ("qtde de pecas vendidas no período",
+                                                              "qtde total de pecas esperadas no período")),
+    Fonte("relatório de capacidade instalada", 5.0, ("qtde de pecas produzidas por maquina",
+                                                      "qtde de maquinas disponíveis para produção")),
+    Fonte("painel do PCP", 6.5, ("qtde de pecas produzidas por dia",
+                                 "qtde de dias até o final do período",
+                                 "qtde total de pecas esperadas no período")),
+    Fonte("ERP — módulo de planejamento completo", 9.0, ("qtde de pecas vendidas no período",
+                                                          "qtde total de pecas esperadas no período",
+                                                          "qtde de dias até o final do período")),
+    Fonte("reunião com gestor de produção", 14.0, ("qtde de pecas produzidas por maquina",
+                                                    "qtde de pecas produzidas por dia",
+                                                    "qtde de maquinas disponíveis para produção",
+                                                    "qtde de insumos em estoque",
+                                                    "prazo de entrega do fornecedor de insumos")),
+    Fonte("consultoria externa de capacidade", 22.0, ("qtde de pecas vendidas no período",
+                                                       "qtde de pecas produzidas por maquina",
+                                                       "qtde de pecas produzidas por dia",
+                                                       "qtde de dias até o final do período",
+                                                       "qtde total de pecas esperadas no período",
+                                                       "qtde de maquinas disponíveis para produção",
+                                                       "qtde de insumos em estoque",
+                                                       "prazo de entrega do fornecedor de insumos")),
+)
+
+class Consultas:
+    """O problema de busca: que fontes consultar, em que ordem.
+
+    O estado é o conjunto de fatos já sabidos, como tupla ordenada —
+    estados com os mesmos fatos são o mesmo hash, não importa a ordem
+    das consultas.
+    """
+
+    def __init__(self, fatos_necessarios: frozenset[str], fontes: tuple[Fonte, ...]):
+        self.fatos_necessarios = fatos_necessarios
+        self.fontes = fontes
+        self._por_nome = {f.nome: f for f in fontes}
+        self.estado_inicial: tuple[str, ...] = ()
+
+    def acoes(self, estado: tuple[str, ...]) -> list[str]:
+        return [f.nome for f in self.fontes]
+
+    def transicao(self, estado: tuple[str, ...], acao: str) -> tuple[str, ...]:
+        # o estado é um CONJUNTO de fatos: consultar fonte que só repete o
+        # que já se sabe devolve o MESMO estado — sem o set(), cada consulta
+        # redundante criaria um estado novo com o fato duplicado.
+        return tuple(sorted(set(estado) | set(self._por_nome[acao].fornece)))
+
+    def objetivo(self, estado: tuple[str, ...]) -> bool:
+        return self.fatos_necessarios.issubset(estado)
+
+    def custo(self, estado: tuple[str, ...], acao: str, estado_seguinte: tuple[str, ...]) -> float:
+        return self._por_nome[acao].latencia
+
+    def heuristica_admissivel(self, estado: tuple[str, ...]) -> float:
+        """A latência da consulta mais barata que ainda entrega um fato faltante.
+
+        Admissível: enquanto faltar fato, é obrigatório consultar PELO MENOS
+        uma fonte que ajude — e nenhuma consulta custa menos do que a menor
+        latência útil. Ignora quantas consultas ainda virão depois dessa.
+        """
+        sabidos = set(estado)
+        faltantes = self.fatos_necessarios - sabidos
+        if not faltantes:
+            return 0.0
+        uteis = [f.latencia for f in self.fontes
+                 if set(f.fornece) & faltantes]
+        return min(uteis)
+
+    def heuristica_inadmissivel(self, estado: tuple[str, ...]) -> float:
+        """Pior caso por fato: cada fato que falta vai custar a consulta mais lenta.
+
+        NÃO é admissível, e é tentadora por isso: "cada dado que falta é uma
+        consulta, e consulta pode demorar o máximo" é o cálculo pessimista
+        que se escreve de primeira. Ela ignora que uma consulta única entrega
+        vários fatos — e por isso faz a fonte cara que resolve tudo parecer
+        o caminho mais promissor: o A* com ela mergulha na consulta lenta e
+        devolve caminho mais caro que o ótimo (o lab-05 mede o dano).
+        """
+        sabidos = set(estado)
+        faltantes = len(self.fatos_necessarios - sabidos)
+        pior_latencia = max(f.latencia for f in self.fontes)
+        return float(faltantes * pior_latencia)
+
+
+PEQUENA = Consultas(FATOS_PEQUENOS, FONTES_PEQUENAS)
+MAIOR = Consultas(FATOS_MAIORES, FONTES_MAIORES)
 ```
-(ams) PS C:\temp\UTFPR\Projeto-AMS> uv run .\D02\D2-03-formular-como-busca\verificar-formulacao.py         
+
+
+**Resultado - Saída:**
+```bash
+(ams) PS C:\temp\UTFPR\Projeto-AMS> uv run .\D02\D2-03-formular-como-busca\verificar-formulacao.py 
 verificar-formulacao — teste de sanidade da formulação de busca
 (sem argumentos: rodando sobre o catálogo — aponte o seu com arquivo.py:ATRIBUTO)
 
