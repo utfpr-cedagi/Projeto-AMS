@@ -33,7 +33,7 @@ otimalidade. Neste subproblema só existe uma heurística admissível — a lat�
 barata que ainda falta — e ela expande 1558 nós para achar o caminho ótimo de custo 10.9 em 6
 ações, o mesmo custo do `custo_uniforme`. A inadmissível (quantidade de fatos que faltam vezes a
 pior latência) expande só 2 nós, mas devolve custo 22.0 — quase o dobro do ótimo — porque
-superestima e empurra o A* direto para a fonte única cara (a "consultoria externa de capacidade"),
+superestima e empurra o A* direto para a fonte única cara (a "consultoria externa de engenharia de manutenção"),
 exatamente como o comentário da função no catálogo prevê. A comparação que sobra aqui não é entre
 duas admissíveis, e sim o contraste do slide 33: a inadmissível é rápida porque está errada, a
 admissível é mais lenta porque preserva a garantia de otimalidade do A*.*
