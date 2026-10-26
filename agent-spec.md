@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** AMS · Assistente de Manutenção Segura
-**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-24
+**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-26
 
 ---
 
@@ -37,25 +37,28 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 **Quando se preenche:** no Laboratório 01, hoje. Refinado na Atividade Orientada.
 
 **Performance:**
-<!-- [a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso] -->
+
+[a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso]
 
 | Intenção | Medida Opoeracional |
 |---|---|
-| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto"** = máquinas de risco alto classificadas como alto ÷ total de máquinas de risco alto no conjunto de avaliação. </br> </br> **Precisão da classe "alto"** = classificadas como alto que são de fato alto ÷ total classificado como alto. </br> </br> *Para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* |
+| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = verdadeiros positivos ÷ total de máquinas realmente classificadas como de alto risco.` </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = verdadeiros positivos ÷ total de máquinas classificadas pelo agente como de alto risco.` </br> </br> </br> *Para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* |
 
 **Environment:**
 
-<!-- [onde o agente opera, com elementos concretos — sistemas, pessoas, documentos, ruído] -->
- Planta Industrial, Máquinas de Produção, Ordens de Serviço, Equipe de Manutenção com técnicos de manutenção, supervisores de segurança.
+[onde o agente opera, com elementos concretos — sistemas, pessoas, documentos, ruído]
+
+Planta Industrial, Máquinas de Produção, Ordens de Serviço, Equipe de Manutenção com técnicos de manutenção, supervisores de segurança.
 
 **Actuators:**
 
-<!-- [o que o agente pode fazer — inclua comunicar e escalar] -->
+[o que o agente pode fazer — inclua comunicar e escalar]
+
 Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. Escalar a ordem para o supervisor de segurança quando o risco for alto ou a classificação for incerta (baixa confiança do modelo).
 
 **Sensors:**
 
-<!-- [o que o agente consegue perceber — só o que ele enxerga existe para ele] -->
+[o que o agente consegue perceber — só o que ele enxerga existe para ele]
 
 Máquinas, Sensores, historico de falhas, Normals Regulamentares em PDF, Descritivo nas ordens de serviços.
 
