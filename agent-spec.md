@@ -40,9 +40,11 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 [a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso]
 
+Medir se o modelo consegue identificar corretamente casos de máquinas com alto risco de falha. O objetivo é alcançar recall e precisão de pelo menos 80% para a classe “alto” e garantir que no máximo 5% dos casos realmente de alto risco sejam classificados como baixo.
+
 | Intenção | Medida Opoeracional |
 |---|---|
-| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = verdadeiros positivos ÷ total de máquinas realmente classificadas como de alto risco.` </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = verdadeiros positivos ÷ total de máquinas classificadas pelo agente como de alto risco.` </br> </br> </br> *Para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* |
+| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.` </br> </br> **Critério:** recall maior ou igual a 80%.  </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = quantidade de máquinas classificadas como alto que realmente eram de alto risco dividido pela quantidade total de máquinas classificadas como alto.` </br> </br> **Critério:** precisão maior ou igual a 80%. </br> </br> *Usando Recall em conjunto com Precision para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* </br></br> **Taxa de classificação como “baixo” dos casos que eram na verdade de alto risco:** proporção de máquinas que realmente apresentavam alto risco de falha, mas foram classificadas pelo agente como de baixo risco. </br> </br> **Fórmula:** `Taxa de erro = máquinas realmente de alto risco classificadas como baixo dividio total de máquinas realmente de alto risco.` </br></br> **Critério:** taxa menor ou igual a 5%. </br> </br>Essa medida controla especificamente os casos de alto risco classificados como baixo; os casos classificados como médio permanecem contabilizados no recall, mas não nessa taxa específica. |
 
 **Environment:**
 
@@ -89,13 +91,13 @@ justificativa — começando por observabilidade e determinismo]
 
 | Dimensão | Minha classificação | Justificativa (uma frase) | Consequências |
 |---|---|---|---|
-| Observabilidade | parcial | As linhas no dataset, possuem registro dos sensores necessários para avaliar o risco de falha, mas no dataset nao existe atualmente as descriçoes das ordens de serviço e essa informação é necessária para o agente consultar as NR. | **Precisa** de Estado interno; memória e contexto. |
-| Número de agentes | único | Um agente especialista que indique a possibilidade iminente de falha na máquina. | **Não precisa** de Protocolo de comunicação e previsão do outro. |
-| Determinismo | determinístico | Deve ser necessario um modelo de linguagem para definicao de NR. | **Não precisa** de Valor esperado, nova tentativa, tempo máximo. |
-| Episódico ou sequencial | episódico | Periodicamente um novo dataset deverá ser informado para o agente avaliar a condição de cada maquina e possibilidade de falha iminente, baseado nos estados dos sensores. | **Não precisa** de Planejamento e avaliação de trajetória inteira. |
-| Estático ou dinâmico | estático | Como o agente vai atuar em um dataset recebido periodicamente, considero que isso definie essa dimensao como estática. | **Não precisa** de Prazo de resposta e resposta parcial aceitável. |
-| Discreto ou contínuo | discreto | O agente vai trazer uma informação que que indica se existe uma possibilidade de falha iminente e tambem indicar procedimentos para manutencao. | **Não precisa** de Discretização declarada, com granularidade justificada. |
-| Conhecido ou desconhecido | desconhecido | Não existe documentação disponível. | **Precisa** de Fase de exploração e registro do que se aprendeu. |
+| Observabilidade | parcial | O agente recebe as leituras dos sensores, o histórico de falhas e os dados da ordem de serviço, mas não observa diretamente todas as condições da máquina nem os fatores ocultos que podem causar uma falha. | **Precisa** de estado interno, memória e contexto. |
+| Número de agentes | único | Um agente especialista que indique a possibilidade iminente de falha na máquina. | **Não Precisa** de protocolo de comunicação e previsão de outro agente. |
+| Determinismo | estocástico | A mesma combinação de leituras pode não produzir o mesmo resultado na máquina, pois existem fatores não observados que influenciam a ocorrência de falhas. | **Precisa** considerar valor esperado, novas tentativas e tempo máximo de resposta. |
+| Episódico ou sequencial | episódico | Cada ordem de serviço é analisada como um caso independente, e a classificação de uma máquina não altera diretamente a análise das ordens seguintes. | **Não precisa** de planejamento e avaliação de uma trajetória inteira. |
+| Estático ou dinâmico | dinâmico | Enquanto a ordem é analisada, a máquina pode continuar operando e suas condições físicas e leituras de sensores podem mudar. | **Precisa** de prazo de resposta e de uma resposta parcial aceitável. |
+| Discreto ou contínuo | contínuo | As leituras de temperatura, rotação, torque e desgaste da ferramenta são variáveis numéricas que podem assumir diferentes valores dentro de intervalos contínuos. | **Precisa** de discretização declarada, com granularidade justificada. |
+| Conhecido ou desconhecido | desconhecido | Embora as normas sejam documentadas, a relação completa entre as leituras dos sensores, as condições da máquina e a ocorrência de falhas precisa ser estimada a partir do histórico de dados. | **Precisa** de fase de exploração e registro do que foi aprendido. |
 
 
 
@@ -138,7 +140,7 @@ calcula, sobre qual conjunto, qual o limiar de sucesso e o
 valor de hoje]
 
 #### **Métrica primária — Recall da classe "alto"**
-**Como se calcula:** máquinas de risco alto classificadas como alto dividido pelo total de máquinas de risco alto.
+**Como se calcula:** quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.
 
 **Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
 
