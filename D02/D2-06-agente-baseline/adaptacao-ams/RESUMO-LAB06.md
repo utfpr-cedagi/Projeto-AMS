@@ -39,8 +39,12 @@ risco. Isso violava a exigência do próprio enunciado: *"inclua casos
 fáceis, casos difíceis e pelo menos dois atípicos: conjunto só de casos
 fáceis produz um número bonito e inútil."*
 
-Esse arquivo foi mantido no repositório (não editado), mas **não é o
-conjunto usado na entrega** — foi substituído pela v2, abaixo.
+Esse arquivo foi mantido no repositório (não editado) por um tempo, mas
+**nunca foi o conjunto usado na entrega** — foi substituído pela v2,
+abaixo. Como está em formato bruto do AI4I2020 (14 colunas) e não roda com
+o que `carregar_casos()` espera hoje (as 9 colunas do formato do lab), ele
+foi removido do repositório — este relato fica como registro de por que a
+primeira amostragem foi descartada.
 
 ---
 
@@ -111,7 +115,7 @@ mostra o que é dado real, o que foi derivado e o que é placeholder:
 
 Detalhes completos (os UDIs exatos de cada categoria, a fórmula da
 vibração passo a passo) estão em
-`D02/D2-06-agente-baseline/FONTE-casos-lab-06-v2.md`.
+`D02/D2-06-agente-baseline/adaptacao-ams/FONTE-casos-lab-06-v2.md`.
 
 ---
 
@@ -234,16 +238,25 @@ acima (recall 0,625, precisão 0,50, acerto geral 0,70, os mesmos 9 erros).
 
 ## 10. Arquivos deste laboratório (estado final)
 
+Os arquivos originais do pacote (`enunciado.pdf`, `COMO-USAR-A-
+RESERVA.pdf`, `FONTE.md`, `casos-de-reserva.csv`, `esqueleto.py`,
+`medir.py`, `teste.py`) ficam na raiz de `D02/D2-06-agente-baseline/`. Tudo
+que foi produzido neste trabalho (dados e análise) está em
+`D02/D2-06-agente-baseline/adaptacao-ams/`:
+
 | Arquivo | O que é |
 |---|---|
-| `casos-lab-06.csv` | primeira tentativa de amostra — mantida no repo, **não usada** |
 | `casos-lab-06-v2.csv` | amostra final usada, curada pelos gatilhos reais |
 | `FONTE-casos-lab-06-v2.md` | procedência da v2: UDIs por categoria, mapeamento de colunas, aviso sobre limiares |
-| `esqueleto.py` | regras recalibradas (`LIMITE_DESGASTE` no lugar de `LIMITE_TEMPERATURA`), apontando para `casos-lab-06-v2.csv` |
-| `medir.py`, `teste.py` | não alterados (arquivos da disciplina) |
 | `analise_baseline.md` | métrica primária, análise de erro, justificativa da recalibração, explicação das 4 falhas esperadas do `teste.py` |
 | `RESUMO-LAB06.md` | este arquivo |
-| `src/ams/baseline.py` | versão definitiva do agente, copiada para o pacote do projeto |
 
-**Pendente (fora deste laboratório):** nenhuma ação de git foi feita —
-as alterações estão no working tree, prontas para revisão com `git diff`.
+Fora desta subpasta: `esqueleto.py` tem as regras recalibradas
+(`LIMITE_DESGASTE` no lugar de `LIMITE_TEMPERATURA`) e aponta pra
+`adaptacao-ams/casos-lab-06-v2.csv`; `medir.py`/`teste.py` não foram
+alterados (arquivos da disciplina); `src/ams/baseline.py` é a versão
+definitiva do agente, copiada para o pacote do projeto.
+
+Todo este trabalho já está commitado: commit `71c7d99` ("D02 labs 03-06:
+catálogo de busca corrigido, baseline do agente e restrições do PEAS"),
+branch `feature/D02_E04`.

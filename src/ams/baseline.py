@@ -13,9 +13,11 @@ família de máquina). As duas ficam porque o ambiente AMS é parcialmente
 observável (`agent-spec.md` §2: falta a descrição da ordem de serviço) —
 um ambiente totalmente observável dispensaria o estado interno.
 
-Limiares calibrados contra `D02/D2-06-agente-baseline/casos-lab-06-v2.csv`
+Limiares calibrados contra
+`D02/D2-06-agente-baseline/adaptacao-ams/casos-lab-06-v2.csv`
 (30 casos reais do AI4I2020 — ver `FONTE-casos-lab-06-v2.md` naquela
-pasta) e validados em `D02/D2-06-agente-baseline/analise_baseline.md`:
+pasta) e validados em
+`D02/D2-06-agente-baseline/adaptacao-ams/analise_baseline.md`:
 recall da classe "alto" = 0,625, precisão = 0,50, acerto geral = 0,70.
 A temperatura absoluta NÃO entrou nos limiares porque, no AI4I2020, ela
 não causa nenhum dos quatro modos de falha documentados (só a diferença

@@ -13,31 +13,27 @@ alto ÷ total de máquinas de risco alto no conjunto.
 - **Acerto geral** (as 3 classes): 21/30 = **0,70** — é o que `medir.py`
   imprime de fábrica; fica registrado aqui por completude, mas a métrica
   que importa pro PEAS é o recall/precisão de "alto" acima.
+- **Frente à meta do PEAS** (`agent-spec.md` §4: recall e precisão de pelo
+  menos 0,80 para a classe "alto", e no máximo 5% dos casos de alto risco
+  classificados como baixo): o baseline fica longe nos dois critérios —
+  recall 0,625 e precisão 0,50, bem abaixo de 0,80; e 2 dos 8 casos de
+  alto risco (A07, A18) foram decididos como `seguir_operando` (baixo) —
+  25%, cinco vezes o limite de 5%. É a distância que a linha de base
+  existe pra expor, não pra já fechar.
 
 ## 2. Onde o agente erra, e por quê
 
-**O agente erra pro lado conservador na maioria das vezes (5 dos 9 erros):
-qualquer caso que cruze o limiar de desgaste (≥150h) ou de vibração
-(>7,0) vira direto `parar_para_manutencao`, mesmo quando o risco real era
-só `inspecionar_antes_de_operar` (casos A02, A08, A13, A17, A23) — a regra
-reativa devolve a decisão mais severa assim que UM limiar é cruzado, sem
-distinguir "perto do limite" de "claramente perigoso".** Isso é
-consequência direta de como `decidir()` está estruturado: a primeira
-condição que casa decide (slide 22), e a condição reativa não tem um nível
-intermediário — ela só sabe dizer "pare" ou "não é comigo".
+O agente erra mais pro lado de ser exigente demais: qualquer leitura que
+passe o limiar de desgaste ou de vibração já manda parar a máquina, mesmo
+quando bastava inspecionar — são 5 dos 9 erros (A02, A08, A13, A17, A23).
+Isso acontece porque a regra só olha duas variáveis e não tem meio-termo:
+ou passou do limite e para, ou não passou e segue.
 
-**O erro mais perigoso é o oposto, em 3 casos (A07, A09, A18): falhas reais
-que o baseline não detectou a tempo, porque nenhuma das duas variáveis
-monitoradas (desgaste, vibração) estava elevada nesses casos — são
-exatamente os padrões que o próprio AI4I2020 documenta como não visíveis a
-um único sensor** (A07 é uma falha sem nenhum dos quatro modos físicos
-documentados disparando; A18 é uma falha por potência — que depende de
-torque × rotação, não de desgaste nem da vibração derivada; A09 só foi
-parcialmente pego pelo estado interno, que rebaixou a decisão pra
-"inspecionar" em vez de "parar"). Confirma, com números, a limitação
-estrutural de um agente de regras com só 2 variáveis reativas: ele tem um
-ponto cego garantido contra qualquer combinação multivariada que nenhuma
-das duas cubra sozinha.
+Nos 3 erros mais graves (A07, A09, A18), o problema é o oposto: a máquina
+falhou de verdade e nem o desgaste nem a vibração estavam altos — o agente
+simplesmente não via motivo pra agir. E em 1 caso (A28), o erro foi mais
+leve: um risco médio que ficou perto dos dois limiares sem passar deles, e
+o agente deixou seguir quando devia inspecionar.
 
 ## 3. Decisão sobre o tipo de agente
 

@@ -27,11 +27,6 @@ class Fonte:
     latencia: float              # custo da consulta (segundos)
     fornece: tuple[str, ...]     # os fatos que a consulta devolve
 
-# Nomes de fatos/fontes trocados do domínio de produção/estoque pro de
-# manutenção segura (latências e estrutura de cobertura IDÊNTICAS às
-# anteriores — só o vocabulário muda, os números das buscas não mudam).
-# Mapa completo em D02/PLANO-renomeacao-dominio-consultas.md.
-
 # A pergunta: "a máquina X pode ser liberada hoje, sem risco?" — quatro
 # fatos, cinco fontes. O caminho ótimo é a combinação de fontes baratas; a
 # fonte única (auditoria completa) é a mais cara.

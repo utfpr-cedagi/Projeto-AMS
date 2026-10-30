@@ -186,52 +186,6 @@ Perguntas que guiam o preenchimento:
 pode fazer sozinho, e a troca qualidade × custo que você
 aceita — com um exemplo numérico]
 
-> 🔶🔶🔶 ANOTAÇÃO DO CLAUDE — APAGUE ESTE BLOCO (ATÉ O MARCADOR DE FECHAMENTO
-> ABAIXO) ANTES DE ENVIAR O ARQUIVO PRO PROFESSOR. Não é conteúdo do curso —
-> é só um sinalizador pra você achar rápido o que foi inserido agora. 🔶🔶🔶
-
-**Latência aceitável:** até 3–5 segundos por ordem — o `dominio.md`
-caracteriza o usuário como "técnico com pouco tempo entre uma ordem e
-outra"; acima disso a resposta deixa de caber no fluxo de trabalho.
-
-**Custo aceitável:** o custo real medido por ordem (`llm.py`, preços de
-referência US$0,10/US$0,40 por 1M tokens de entrada/saída) fica da ordem
-de US$0,0001 por ordem — muito abaixo de qualquer limiar que valeria a
-pena formalizar; o teto proposto é R$ 0,05 por ordem, com folga grande.
-
-**O que o agente jamais pode fazer sozinho:** liberar uma máquina pra
-operar sem bloqueio/etiquetagem (LOTO) quando a classificação de risco for
-"alto" — mesmo com alta confiança do modelo. Consistente com
-`dominio.md`: "a decisão final continua sendo do técnico."
-
-**A troca qualidade × custo — função de utilidade:**
-
-```
-U(lote) = w_Q·Qualidade − w_C·Custo − w_L·Latência − w_R·Risco
-```
-
-| Termo | O que é no AMS | De onde vem |
-|---|---|---|
-| Qualidade | Recall da classe "alto" (métrica primária, §4) | medido sobre o lote avaliado |
-| Custo | custo em R$ do lote (chamadas ao LLM) | `custo_usd` de `llm.py::_registrar`, convertido |
-| Latência | segundos até a resposta, média do lote | `latencia_ms/1000`, logado em `log.py` |
-| Risco | custo esperado do erro irreversível: P(falso negativo em "alto") × custo de um acidente | P(...) é a Secundária 2 do §4 |
-
-Pesos ilustrativos e exemplo numérico (com os números reais medidos no
-lab-06): `w_Q=R$1.000`, `w_C=5`, `w_L=R$2/s`, `w_R=R$500.000` (ordem de
-grandeza de um acidente grave — valor ilustrativo, não atuarial); com
-recall=0,625, custo≈US$0,00011, latência≈0,8s, P(falso negativo
-alto)=0,25:
-
-```
-U = 1000×0,625 − 5×0,00011 − 2×0,8 − 500000×0,25 ≈ R$ −124.377
-```
-
-O resultado negativo, dominado pelo termo de risco, é o comportamento
-esperado de um peso alto nesse termo: nenhum ganho de qualidade, custo ou
-latência compensa um erro irreversível.
-
-🔶🔶🔶 FIM DA ANOTAÇÃO DO CLAUDE — apague até aqui 🔶🔶🔶
 
 ---
 
@@ -269,7 +223,7 @@ Perguntas que guiam o preenchimento:
 
 **Classe modificada:**
 
-*consultdas_ams.py*
+*consultas_ams.py*
 
 ```python
 """Subproblema 2 do catálogo: a sequência de consultas para responder uma pergunta.
@@ -300,11 +254,6 @@ class Fonte:
     nome: str
     latencia: float              # custo da consulta (segundos)
     fornece: tuple[str, ...]     # os fatos que a consulta devolve
-
-# Nomes de fatos/fontes trocados do domínio de produção/estoque pro de
-# manutenção segura (latências e estrutura de cobertura IDÊNTICAS às
-# anteriores — só o vocabulário muda, os números das buscas não mudam).
-# Mapa completo em D02/PLANO-renomeacao-dominio-consultas.md.
 
 # A pergunta: "a máquina X pode ser liberada hoje, sem risco?" — quatro
 # fatos, cinco fontes. O caminho ótimo é a combinação de fontes baratas; a
@@ -445,11 +394,10 @@ MAIOR = Consultas(FATOS_MAIORES, FONTES_MAIORES)
 
 **Resultado - Saída:**
 ```bash
-(ams) PS C:\temp\UTFPR\Projeto-AMS> uv run .\D02\D2-03-formular-como-busca\verificar-formulacao.py 
-verificar-formulacao — teste de sanidade da formulação de busca
-(sem argumentos: rodando sobre o catálogo — aponte o seu com arquivo.py:ATRIBUTO)
-
-— diagnostico.PEQUENA
+(ams) PS C:\temp\UTFPR\Projeto-AMS\D02\D2-03-formular-como-busca> uv run python verificar-formulacao.py  "comum\problemas\consultas_ams.py:PEQUENA" "comum\problemas\consultas_ams.py:MAIOR"   
+verificar-formulacao — teste de sanidade da formulação de busca                            
+                                             
+— comum\problemas\consultas_ams.py:PEQUENA
   1. estado é hashable ✅
   2. transição é função ✅
   3. ações estáveis na ordem ✅
@@ -458,43 +406,7 @@ verificar-formulacao — teste de sanidade da formulação de busca
   6. estado não guarda o caminho ✅
   resumo: 6 ✅ · 0 ⚠️ · 0 ❌
 
-— diagnostico.MAIOR
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— consultas.PEQUENA
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— consultas.MAIOR
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— conformidade.PEQUENA
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— conformidade.MAIOR
+— comum\problemas\consultas_ams.py:MAIOR
   1. estado é hashable ✅
   2. transição é função ✅
   3. ações estáveis na ordem ✅

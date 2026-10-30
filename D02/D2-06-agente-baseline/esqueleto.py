@@ -35,7 +35,7 @@ from pathlib import Path
 # Configuração — a troca do dataset é UMA LINHA aqui (slide 29).
 # --------------------------------------------------------------------------
 # CAMINHO_DOS_CASOS = "casos-de-reserva.csv"  # versão anterior: reserva sintética
-CAMINHO_DOS_CASOS = "casos-lab-06-v2.csv"
+CAMINHO_DOS_CASOS = "adaptacao-ams/casos-lab-06-v2.csv"
 # Troque pelo SEU conjunto quando estiver pronto:
 # CAMINHO_DOS_CASOS = "dados/meus_casos.csv"
 
@@ -43,7 +43,7 @@ CAMINHO_DOS_CASOS = "casos-lab-06-v2.csv"
 # Os limiares das regras — recalibrados pro domínio AMS/AI4I2020 real.
 # (Os valores comentados abaixo eram os do domínio de exemplo da reserva
 # sintética — fora de escala pro dataset real: temperatura real fica toda
-# entre 33-38°C, nunca perto de 78. Ver FONTE-casos-lab-06-v2.md.)
+# entre 33-38°C, nunca perto de 78. Ver adaptacao-ams/FONTE-casos-lab-06-v2.md.)
 # --------------------------------------------------------------------------
 # LIMITE_VIBRACAO = 7.0          # mm/s — versão anterior (reserva)
 # LIMITE_TEMPERATURA = 78.0      # °C   — versão anterior (reserva); sem uso
