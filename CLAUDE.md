@@ -59,6 +59,34 @@ chave do Gemini no `.env`, o cliente roda em modo offline
   trabalho (`feature/D0X_EY`, `uv-setup`); levar para `main` é decisão
   separada do autor, feita junto com o resto do commit do dia.
 
+## Fluxo de entrega para `main`
+
+`main` guarda a estrutura inicial que o professor passou (sem `uv`, sem
+`CLAUDE.md`) — o trabalho de cada disciplina acontece em
+`feature/D0X_EY`, mas só uma branch de entrega, criada a partir de `main`,
+abre PR pra lá.
+
+1. Trabalhe normalmente em `feature/D0X_EY` (criada a partir de `uv-setup`).
+2. Pra entregar, crie uma branch a partir de `main`:
+   `git checkout main && git checkout -b entrega/D0X_EY`.
+3. Traga só o código do laboratório/disciplina:
+   `git checkout feature/D0X_EY -- D0X/` (mais qualquer arquivo relacionado
+   fora de `D0X/`, como seções novas do `agent-spec.md` — caso a caso).
+4. Remova explicitamente o que não deve ir (o `checkout -- path` não apaga
+   sozinho o que falta no destino): `CLAUDE.md`/`D0X/CLAUDE.md`,
+   anotações de trabalho já aplicadas e obsoletas, `pyproject.toml`/
+   `uv.lock` e qualquer mudança em `scripts/`/`README.md` que só fale de
+   `uv`.
+5. Confira com `git status` / `git diff --cached --stat` antes de commitar.
+6. Abra o PR de `entrega/D0X_EY` para `main`.
+
+Nunca faça merge de `main` em `uv-setup` — são linhas de história
+separadas de propósito (`uv-setup` carrega a migração; `main` não).
+
+`entrega/D02` foi o caso retroativo: cobriu a disciplina inteira de uma vez
+(D2-01 a D2-09), já que esse padrão por encontro só passou a valer a partir
+da D3.
+
 ## Lições aprendidas e convenções por disciplina
 
 Lições específicas de cada disciplina (ex.: os bugs comuns dos laboratórios
