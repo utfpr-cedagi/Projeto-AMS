@@ -118,6 +118,23 @@ Perguntas que guiam o preenchimento:
 [o tipo mais simples que resolve, justificado pela dimensão
 do ambiente que o obriga]
 
+**Agente baseado em utilidade** (com estado interno — pré-requisito de
+"baseado em modelo").
+
+A observabilidade parcial (§2) já elimina o reativo simples: o agente
+precisa de memória para compensar o que não vê no instante — é exatamente
+o que `EstadoDaFrota` guarda em `baseline.py`, e o que os 3 erros mais
+graves da linha de base (A07, A09, A18, em `analise_baseline.md`) mostram
+na prática: a máquina falhou sem que a leitura do momento acusasse nada.
+
+Mas "baseado em modelo" não basta. A medida de desempenho (§4) não é um
+teste de objetivo binário — ela pondera os erros de forma assimétrica: um
+falso "baixo" (máquina de risco alto liberada) é tratado como até 5x mais
+grave que os demais, com um limite próprio (≤5%) separado do recall geral.
+Avaliar qual decisão minimiza o custo esperado, e não apenas "bateu o
+limiar", é função de utilidade — por isso o tipo mínimo que resolve é o
+agente baseado em utilidade.
+
 ---
 
 ## 4. Medida de desempenho
@@ -186,6 +203,33 @@ Perguntas que guiam o preenchimento:
 pode fazer sozinho, e a troca qualidade × custo que você
 aceita — com um exemplo numérico]
 
+**Latência aceitável:** até ~15 segundos entre o técnico abrir a ordem de
+serviço e receber a recomendação — o usuário (`dominio.md`, item 3) tem
+"pouco tempo entre uma ordem e outra" e precisa de resposta curta; acima
+disso, o técnico decide no boca-a-boca antes que o sistema responda, e a
+recomendação perde valor por chegar tarde.
+
+**Custo aceitável:** o volume é de ordens de serviço, não de requisições em
+massa — o custo por ordem (chamadas de LLM + consultas) deve ficar baixo o
+suficiente para rodar em toda ordem aberta na planta, não só nas
+suspeitas. Valor inicial de referência: poucos centavos por ordem — a
+calibrar quando houver medição real de uso (D7 em diante).
+
+**O que o agente jamais faz sozinho:** bloquear/etiquetar fisicamente a
+máquina (LOTO) ou liberar a máquina para operação — vem do catálogo de
+ações (§6). O agente recomenda; quem decide e executa continua sendo o
+técnico (`dominio.md`, item 2).
+
+**A troca qualidade × custo, com exemplo numérico:** a formulação por
+busca (§7, `FONTES_PEQUENAS`) já expõe essa troca em números — a fonte
+única "auditoria completa de manutenção" fecha os 4 fatos sozinha por
+15.0 de latência, contra combinar 3 fontes baratas ("painel de sensores"
+1.2 + "sistema de manutenção — status" 2.0 + "histórico de falhas" 6.0 =
+9.2) que fecham o mesmo conjunto por ~39% menos latência total. A troca
+que aceito: preferir a combinação barata sempre que o prazo (15s) permitir
+buscar mais de uma fonte, e reservar a fonte única cara para quando a
+resposta não pode esperar — é o par custo×latência que a busca informada
+(gulosa/A*) decide automaticamente a cada ordem de serviço.
 
 ---
 

@@ -58,11 +58,11 @@ outras — precisa ser replicada manualmente se o mesmo erro estiver lá
 também. Em 2026-10-24, a cópia de `D2-04` foi corrigida (fato
 `"qtde total de pecas esperadas no período"` exigido por `FATOS_MAIORES`
 sem nenhuma `Fonte` que o fornecesse) e `FONTES_MAIORES` foi expandida de 3
-para 14 fontes para dar contraste real entre as buscas; a cópia de `D2-03`
-ainda não recebeu a mesma correção — vale revisar antes de fechar aquele
-laboratório (o trecho colado em `agent-spec.md` §7 também carrega essa
-versão desatualizada, com um typo adicional: `"produizdas"` em
-`FATOS_MAIORES` não bate com `"produzidas"` usado em `FONTES_MAIORES`).
+para 14 fontes para dar contraste real entre as buscas. Em 2026-11-02,
+conferido: a cópia de `D2-03` já recebeu a mesma correção (`FONTES_MAIORES`
+com 14 fontes, sem o typo `"produizdas"`) e passa as 6 verificações do
+`verificar-formulacao.py` tanto em `PEQUENA` quanto em `MAIOR` — o trecho
+colado em `agent-spec.md` §7 também já está na versão corrigida.
 
 ## Lições aprendidas (vale lembrar antes de mexer em dados de busca)
 
