@@ -51,8 +51,12 @@ chave do Gemini no `.env`, o cliente roda em modo offline
 - `feature/D0X_EY` — uma branch por disciplina+encontro (ex.:
   `feature/D02_E04` = disciplina 2, encontro 4). É onde o trabalho de cada
   laboratório acontece.
-- `uv-setup` — branch de infraestrutura (migração do projeto para `uv`),
-  paralela ao trabalho de disciplina.
+- `uv-setup` — tronco de trabalho cumulativo (infraestrutura `uv` + todo o
+  conteúdo de disciplina já fechado). Cada `feature/D0X_EY` nasce dela; ao
+  fechar uma disciplina, a feature branch correspondente é mergeada de
+  volta aqui antes de abrir a próxima — assim `uv-setup` carrega adiante
+  tudo que as próximas disciplinas podem precisar (`agent-spec.md`,
+  módulos em `src/ams/`, etc.).
 - `main` — só recebe merge ao final do ciclo de trabalho; durante o dia as
   branches de feature ficam à frente dela.
 - `CLAUDE.md` (este arquivo e os das subpastas) viaja junto nas branches de
