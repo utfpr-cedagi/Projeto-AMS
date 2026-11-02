@@ -28,111 +28,77 @@ class Fonte:
     fornece: tuple[str, ...]     # os fatos que a consulta devolve
 
 
-# # A pergunta: "quantos dias de férias ainda tenho, já considerando a venda
-# # do saldo que pedi?" — quatro fatos, cinco fontes.
-# FATOS_PEQUENOS: frozenset[str] = frozenset({
-#     "saldo de dias do funcionário",
-#     "regra de venda do acordo coletivo",
-#     "janela mínima exigida pela política",
-#     "aprovações pendentes do gestor",
-# })
-# FONTES_PEQUENAS: tuple[Fonte, ...] = (
-#     Fonte("RH Digital — meu saldo", 1.2, ("saldo de dias do funcionário",)),
-#     Fonte("intranet — política de férias", 2.0, ("janela mínima exigida pela política",)),
-#     Fonte("PDF do acordo coletivo", 6.0, ("regra de venda do acordo coletivo",
-#                                           "janela mínima exigida pela política")),
-#     Fonte("sistema do gestor", 3.5, ("aprovações pendentes do gestor",)),
-#     Fonte("atendimento humano do RH", 15.0, ("saldo de dias do funcionário",
-#                                              "regra de venda do acordo coletivo",
-#                                              "janela mínima exigida pela política",
-#                                              "aprovações pendentes do gestor")),
-# )
-
-# # A pergunta maior: "o pedido do cliente pode ser faturado hoje?" — oito
-# # fatos, e nenhuma fonte cobre tudo sozinha.
-# FATOS_MAIORES: frozenset[str] = frozenset({
-#     "saldo de crédito do cliente",
-#     "status do cadastro fiscal",
-#     "preço vigente da tabela",
-#     "estoque disponível do item",
-#     "prazo de entrega da transportadora",
-#     "limite de faturamento sem aprovação",
-#     "pedidos em aberto do cliente",
-#     "regra de desconto do canal",
-# })
-# FONTES_MAIORES: tuple[Fonte, ...] = (
-#     Fonte("ERP — ficha do cliente", 0.8, ("saldo de crédito do cliente",
-#                                           "pedidos em aberto do cliente")),
-#     Fonte("serviço de cadastro", 1.1, ("status do cadastro fiscal",)),
-#     Fonte("tabela de preços do dia", 0.9, ("preço vigente da tabela",)),
-#     Fonte("WMS — saldo do depósito", 1.3, ("estoque disponível do item",)),
-#     Fonte("portal da transportadora", 4.0, ("prazo de entrega da transportadora",)),
-#     Fonte("política de crédito em PDF", 7.0, ("limite de faturamento sem aprovação",)),
-#     Fonte("regras do canal no wiki", 2.5, ("regra de desconto do canal",)),
-#     Fonte("ERP — consulta completa do cliente", 6.5, ("saldo de crédito do cliente",
-#                                                       "status do cadastro fiscal",
-#                                                       "pedidos em aberto do cliente")),
-#     Fonte("pacote de integração do parceiro", 12.0, ("preço vigente da tabela",
-#                                                      "estoque disponível do item",
-#                                                      "regra de desconto do canal")),
-#     Fonte("atendimento humano comercial", 20.0, ("saldo de crédito do cliente",
-#                                                  "status do cadastro fiscal",
-#                                                  "preço vigente da tabela",
-#                                                  "estoque disponível do item",
-#                                                  "prazo de entrega da transportadora",
-#                                                  "limite de faturamento sem aprovação",
-#                                                  "pedidos em aberto do cliente",
-#                                                  "regra de desconto do canal")),
-#     Fonte("dashboards de operação", 3.0, ("estoque disponível do item",
-#                                           "pedidos em aberto do cliente")),
-#     Fonte("robô de email do comercial", 9.0, ("limite de faturamento sem aprovação",
-#                                               "regra de desconto do canal")),
-#     Fonte("legado COBOL via fila", 8.5, ("saldo de crédito do cliente",
-#                                          "preço vigente da tabela")),
-#     Fonte("consulta do jurídico", 14.0, ("status do cadastro fiscal",
-#                                          "limite de faturamento sem aprovação")),
-# )
-
-
-
-# A pergunta: "Quantas maquinas estão disponíveis para uso, considerando a manutenção programada?" 
-# — quatro fatos, quatro fontes.
+# A pergunta: "a máquina X pode ser liberada hoje, sem risco?" — quatro
+# fatos, cinco fontes. O caminho ótimo é a combinação de fontes baratas; a
+# fonte única (auditoria completa) é a mais cara.
 FATOS_PEQUENOS: frozenset[str] = frozenset({
-    "qtde de maquinas totais",
-    "qtde de maquinas em manutenção",
-    "qtde de maquinas disponíveis",
-    "maquinas com manutenção programada",
+    "histórico de falhas da máquina",
+    "normas regulamentares aplicáveis (NR)",
+    "leitura atual dos sensores",
+    "manutenção preventiva programada",
 })
 
 FONTES_PEQUENAS: tuple[Fonte, ...] = (
-    Fonte("Depto Producao — Qtde Máquinas", 1.2, ("qtde de maquinas disponíveis")),
-    Fonte("Depto Manutenção", 2.0, ("qtde de maquinas em manutenção","maquinas com manutenção programada")),
-    Fonte("Depto Compras", 6.0, ("qtde de maquinas totais",)),
-    Fonte("Depto Administrativo", 15.0, ("qtde de maquinas totais",
-                                         "qtde de maquinas em manutenção",
-                                         "qtde de maquinas disponíveis",
-                                         "maquinas com manutenção programada")),
+    Fonte("painel de sensores — leitura atual", 1.2 , ("leitura atual dos sensores",)),
+    Fonte("sistema de manutenção — status"    , 2.0 , ("normas regulamentares aplicáveis (NR)", "manutenção preventiva programada")),
+    Fonte("histórico de falhas (sistema)"     , 6.0 , ("histórico de falhas da máquina",)),
+    Fonte("relatório semanal de manutenção"   , 4.5 , ("histórico de falhas da máquina", "leitura atual dos sensores")),
+    Fonte("auditoria completa de manutenção"  , 15.0, (
+                "histórico de falhas da máquina"
+                , "normas regulamentares aplicáveis (NR)"
+                , "leitura atual dos sensores"
+                , "manutenção preventiva programada")),
 )
 
-# A pergunta maior: "A producao programada poderá ser atendida neste período?" — oito
-# fatos, e nenhuma fonte cobre tudo sozinha.
+# A pergunta maior: "a máquina L14720 pode ser liberada para operação,
+# inspecionada antes, ou precisa parar para manutenção?" — oito fatos,
+# catorze fontes. A maioria das fontes é barata e específica; só a
+# consultoria externa cobre tudo de uma vez, por um preço bem mais alto do
+# que combinar as fontes baratas.
 FATOS_MAIORES: frozenset[str] = frozenset({
-    "qtde de pecas produzidas por maquina",
-    "qtde de pecas em estoque",
-    "qtde de pecas produizdas por dia",
-    "qtde de dias até o final do período",
-    "qtde total de pecas esperadas no período"
+    "histórico de intervenções anteriores",
+    "leitura atual de vibração",
+    "leitura atual de temperatura do mancal",
+    "tempo decorrido desde a última manutenção",
+    "tendência das últimas leituras de vibração",
+    "pendências abertas na ordem de serviço",
+    "disponibilidade de peça de reposição",
+    "prazo de entrega da peça de reposição",
 })
 FONTES_MAIORES: tuple[Fonte, ...] = (
-    Fonte("ERP — Plano de Producao", 0.8, ("qtde total de pecas esperadas no período",
-                                          "qtde de dias até o final do período",
-                                          "qtde de pecas produzidas por dia",
-                                          "qtde de pecas produzidas por maquina")),
-    Fonte("capacidade de produção", 1.1, ("qtde de pecas produzidas por dia",
-                                          "qtde de pecas produzidas por maquina",
-                                          "qtde de dias até o final do período")),
-    Fonte("saldo de pecasfaltantes a serem produzidas", 0.9, ("qtde de dias até o final do período",
-                                                     "qtde de pecas produzidas por dia",)),
+    Fonte("sistema de manutenção — histórico de intervenções", 0.9, ("histórico de intervenções anteriores",)),
+    Fonte("sensor de vibração — leitura atual"               , 1.1, ("leitura atual de vibração",)),
+    Fonte("sensor de temperatura — leitura atual"            , 1.3, ("leitura atual de temperatura do mancal",)),
+    Fonte("registro de manutenção — última intervenção"      , 0.7, ("tempo decorrido desde a última manutenção",)),
+    Fonte("ordem de serviço — pendências abertas"            , 1.0, ("pendências abertas na ordem de serviço",)),
+    Fonte("almoxarifado — peças de reposição"                , 1.2, ("disponibilidade de peça de reposição",)),
+    Fonte("portal do fornecedor de peças"                    , 3.5, ("prazo de entrega da peça de reposição",)),
+    Fonte("robô de email da manutenção"                      , 2.8, ("disponibilidade de peça de reposição", "prazo de entrega da peça de reposição")),
+    Fonte("sistema de manutenção — histórico completo"       , 4.0, ("histórico de intervenções anteriores", "tendência das últimas leituras de vibração")),
+    Fonte("relatório de condição da máquina"                 , 5.0, ("leitura atual de vibração", "pendências abertas na ordem de serviço")),
+    Fonte("painel de monitoramento preditivo"                , 6.5, (
+                "leitura atual de temperatura do mancal"
+                , "tempo decorrido desde a última manutenção"
+                , "tendência das últimas leituras de vibração")),
+    Fonte("sistema de manutenção — módulo completo"          , 9.0, (
+                "histórico de intervenções anteriores"
+                , "tendência das últimas leituras de vibração"
+                , "tempo decorrido desde a última manutenção")),
+    Fonte("reunião com o técnico responsável"                , 14.0, (
+                "leitura atual de vibração"
+                , "leitura atual de temperatura do mancal"
+                , "pendências abertas na ordem de serviço"
+                , "disponibilidade de peça de reposição"
+                , "prazo de entrega da peça de reposição")),
+    Fonte("consultoria externa de engenharia de manutenção"  , 22.0, (
+                "histórico de intervenções anteriores"
+                , "leitura atual de vibração"
+                , "leitura atual de temperatura do mancal"
+                , "tempo decorrido desde a última manutenção"
+                , "tendência das últimas leituras de vibração"
+                , "pendências abertas na ordem de serviço"
+                , "disponibilidade de peça de reposição"
+                , "prazo de entrega da peça de reposição")),
 )
 
 class Consultas:

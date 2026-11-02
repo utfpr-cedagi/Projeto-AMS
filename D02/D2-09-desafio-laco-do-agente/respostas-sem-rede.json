@@ -1,0 +1,25 @@
+{
+  "descricao": "As respostas 'do modelo' para o modo SEM REDE do desafio: cada elemento é o que uma chamada real devolveria — um pedido de função (functionCall) ou um texto final (text). Rodar contra esta lista gasta zero requisições e zero cota.",
+  "cenario": "OS-2026-0042 · máquina L14720 · o mesmo caso das demonstrações",
+  "respostas": [
+    {
+      "functionCall": {
+        "name": "consultar_registro",
+        "args": { "maquina": "L14720" }
+      }
+    },
+    {
+      "functionCall": {
+        "name": "registrar_recomendacao",
+        "args": {
+          "ordem": "OS-2026-0042",
+          "recomendacao": "parar_para_manutencao",
+          "justificativa": "Pendência de alinhamento do mancal dianteiro em aberto (inspeção 12/09) e vibração em alta há cinco leituras (4,1 → 6,8 mm/s). A intervenção prevista fecha o achado; operar antes arrisca falha do mancal."
+        }
+      }
+    },
+    {
+      "text": "Recomendei PARAR PARA MANUTENÇÃO na OS-2026-0042 (L14720). O registro mostra pendência de alinhamento do mancal dianteiro em aberto desde 12/09 e vibração subindo há cinco leituras (4,1 → 6,8 mm/s). A recomendação está registrada na ordem."
+    }
+  ]
+}

@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** AMS · Assistente de Manutenção Segura
-**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-09
+**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-26
 
 ---
 
@@ -37,25 +37,30 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 **Quando se preenche:** no Laboratório 01, hoje. Refinado na Atividade Orientada.
 
 **Performance:**
-<!-- [a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso] -->
+
+[a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso]
+
+Medir se o modelo consegue identificar corretamente casos de máquinas com alto risco de falha. O objetivo é alcançar recall e precisão de pelo menos 80% para a classe “alto” e garantir que no máximo 5% dos casos realmente de alto risco sejam classificados como baixo.
 
 | Intenção | Medida Opoeracional |
 |---|---|
-| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto"** = máquinas de risco alto classificadas como alto ÷ total de máquinas de risco alto no conjunto de avaliação. </br> </br> **Precisão da classe "alto"** = classificadas como alto que são de fato alto ÷ total classificado como alto. </br> </br> *Para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* |
+| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.` </br> </br> **Critério:** recall maior ou igual a 80%.  </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = quantidade de máquinas classificadas como alto que realmente eram de alto risco dividido pela quantidade total de máquinas classificadas como alto.` </br> </br> **Critério:** precisão maior ou igual a 80%. </br> </br> *Usando Recall em conjunto com Precision para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* </br></br> **Taxa de classificação como “baixo” dos casos que eram na verdade de alto risco:** proporção de máquinas que realmente apresentavam alto risco de falha, mas foram classificadas pelo agente como de baixo risco. </br> </br> **Fórmula:** `Taxa de erro = máquinas realmente de alto risco classificadas como baixo dividio total de máquinas realmente de alto risco.` </br></br> **Critério:** taxa menor ou igual a 5%. </br> </br>Essa medida controla especificamente os casos de alto risco classificados como baixo; os casos classificados como médio permanecem contabilizados no recall, mas não nessa taxa específica. |
 
 **Environment:**
 
-<!-- [onde o agente opera, com elementos concretos — sistemas, pessoas, documentos, ruído] -->
- Planta Industrial, Máquinas de Produção, Ordens de Serviço, Equipe de Manutenção com técnicos de manutenção, supervisores de segurança.
+[onde o agente opera, com elementos concretos — sistemas, pessoas, documentos, ruído]
+
+Planta Industrial, Máquinas de Produção, Ordens de Serviço, Equipe de Manutenção com técnicos de manutenção, supervisores de segurança.
 
 **Actuators:**
 
-<!-- [o que o agente pode fazer — inclua comunicar e escalar] -->
-Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. 
+[o que o agente pode fazer — inclua comunicar e escalar]
+
+Classificar os níveis de riscos. Apresentar necessidade de bloqueio e etiquetagem antes da manutenção. Definir qual NR é aplicável. Estimar riscos de falhas iminentes. Apresentar procedimentos para intervenção. Escalar a ordem para o supervisor de segurança quando o risco for alto ou a classificação for incerta (baixa confiança do modelo).
 
 **Sensors:**
 
-<!-- [o que o agente consegue perceber — só o que ele enxerga existe para ele] -->
+[o que o agente consegue perceber — só o que ele enxerga existe para ele]
 
 Máquinas, Sensores, historico de falhas, Normals Regulamentares em PDF, Descritivo nas ordens de serviços.
 
@@ -86,13 +91,13 @@ justificativa — começando por observabilidade e determinismo]
 
 | Dimensão | Minha classificação | Justificativa (uma frase) | Consequências |
 |---|---|---|---|
-| Observabilidade | parcial | As linhas no dataset, possuem registro dos sensores necessários para avaliar o risco de falha, mas no dataset nao existe atualmente as descriçoes das ordens de serviço e essa informação é necessária para o agente consultar as NR. | **Precisa** de Estado interno; memória e contexto. |
-| Número de agentes | único | Um agente especialista que indique a possibilidade iminente de falha na máquina. | **Não precisa** de Protocolo de comunicação e previsão do outro. |
-| Determinismo | determinístico | Deve ser necessario um modelo de linguagem para definicao de NR. | **Não precisa** de Valor esperado, nova tentativa, tempo máximo. |
-| Episódico ou sequencial | episódico | Periodicamente um novo dataset deverá ser informado para o agente avaliar a condição de cada maquina e possibilidade de falha iminente, baseado nos estados dos sensores. | **Não precisa** de Planejamento e avaliação de trajetória inteira. |
-| Estático ou dinâmico | estático | Como o agente vai atuar em um dataset recebido periodicamente, considero que isso definie essa dimensao como estática. | **Não precisa** de Prazo de resposta e resposta parcial aceitável. |
-| Discreto ou contínuo | discreto | O agente vai trazer uma informação que que indica se existe uma possibilidade de falha iminente e tambem indicar procedimentos para manutencao. | **Não precisa** de Discretização declarada, com granularidade justificada. |
-| Conhecido ou desconhecido | desconhecido | Não existe documentação disponível. | **Precisa** de Fase de exploração e registro do que se aprendeu. |
+| Observabilidade | parcial | O agente recebe as leituras dos sensores, o histórico de falhas e os dados da ordem de serviço, mas não observa diretamente todas as condições da máquina nem os fatores ocultos que podem causar uma falha. | **Precisa** de estado interno, memória e contexto. |
+| Número de agentes | único | Um agente especialista que indique a possibilidade iminente de falha na máquina. | **Não Precisa** de protocolo de comunicação e previsão de outro agente. |
+| Determinismo | estocástico | A mesma combinação de leituras pode não produzir o mesmo resultado na máquina, pois existem fatores não observados que influenciam a ocorrência de falhas. | **Precisa** considerar valor esperado, novas tentativas e tempo máximo de resposta. |
+| Episódico ou sequencial | episódico | Cada ordem de serviço é analisada como um caso independente, e a classificação de uma máquina não altera diretamente a análise das ordens seguintes. | **Não precisa** de planejamento e avaliação de uma trajetória inteira. |
+| Estático ou dinâmico | dinâmico | Enquanto a ordem é analisada, a máquina pode continuar operando e suas condições físicas e leituras de sensores podem mudar. | **Precisa** de prazo de resposta e de uma resposta parcial aceitável. |
+| Discreto ou contínuo | contínuo | As leituras de temperatura, rotação, torque e desgaste da ferramenta são variáveis numéricas que podem assumir diferentes valores dentro de intervalos contínuos. | **Precisa** de discretização declarada, com granularidade justificada. |
+| Conhecido ou desconhecido | desconhecido | Embora as normas sejam documentadas, a relação completa entre as leituras dos sensores, as condições da máquina e a ocorrência de falhas precisa ser estimada a partir do histórico de dados. | **Precisa** de fase de exploração e registro do que foi aprendido. |
 
 
 
@@ -112,6 +117,23 @@ Perguntas que guiam o preenchimento:
 
 [o tipo mais simples que resolve, justificado pela dimensão
 do ambiente que o obriga]
+
+**Agente baseado em utilidade** (com estado interno — pré-requisito de
+"baseado em modelo").
+
+A observabilidade parcial (§2) já elimina o reativo simples: o agente
+precisa de memória para compensar o que não vê no instante — é exatamente
+o que `EstadoDaFrota` guarda em `baseline.py`, e o que os 3 erros mais
+graves da linha de base (A07, A09, A18, em `analise_baseline.md`) mostram
+na prática: a máquina falhou sem que a leitura do momento acusasse nada.
+
+Mas "baseado em modelo" não basta. A medida de desempenho (§4) não é um
+teste de objetivo binário — ela pondera os erros de forma assimétrica: um
+falso "baixo" (máquina de risco alto liberada) é tratado como até 5x mais
+grave que os demais, com um limite próprio (≤5%) separado do recall geral.
+Avaliar qual decisão minimiza o custo esperado, e não apenas "bateu o
+limiar", é função de utilidade — por isso o tipo mínimo que resolve é o
+agente baseado em utilidade.
 
 ---
 
@@ -135,7 +157,7 @@ calcula, sobre qual conjunto, qual o limiar de sucesso e o
 valor de hoje]
 
 #### **Métrica primária — Recall da classe "alto"**
-**Como se calcula:** máquinas de risco alto classificadas como alto dividido pelo total de máquinas de risco alto.
+**Como se calcula:** quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.
 
 **Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
 
@@ -181,6 +203,34 @@ Perguntas que guiam o preenchimento:
 pode fazer sozinho, e a troca qualidade × custo que você
 aceita — com um exemplo numérico]
 
+**Latência aceitável:** até ~15 segundos entre o técnico abrir a ordem de
+serviço e receber a recomendação — o usuário (`dominio.md`, item 3) tem
+"pouco tempo entre uma ordem e outra" e precisa de resposta curta; acima
+disso, o técnico decide no boca-a-boca antes que o sistema responda, e a
+recomendação perde valor por chegar tarde.
+
+**Custo aceitável:** o volume é de ordens de serviço, não de requisições em
+massa — o custo por ordem (chamadas de LLM + consultas) deve ficar baixo o
+suficiente para rodar em toda ordem aberta na planta, não só nas
+suspeitas. Valor inicial de referência: poucos centavos por ordem — a
+calibrar quando houver medição real de uso (D7 em diante).
+
+**O que o agente jamais faz sozinho:** bloquear/etiquetar fisicamente a
+máquina (LOTO) ou liberar a máquina para operação — vem do catálogo de
+ações (§6). O agente recomenda; quem decide e executa continua sendo o
+técnico (`dominio.md`, item 2).
+
+**A troca qualidade × custo, com exemplo numérico:** a formulação por
+busca (§7, `FONTES_PEQUENAS`) já expõe essa troca em números — a fonte
+única "auditoria completa de manutenção" fecha os 4 fatos sozinha por
+15.0 de latência, contra combinar 3 fontes baratas ("painel de sensores"
+1.2 + "sistema de manutenção — status" 2.0 + "histórico de falhas" 6.0 =
+9.2) que fecham o mesmo conjunto por ~39% menos latência total. A troca
+que aceito: preferir a combinação barata sempre que o prazo (15s) permitir
+buscar mais de uma fonte, e reservar a fonte única cara para quando a
+resposta não pode esperar — é o par custo×latência que a busca informada
+(gulosa/A*) decide automaticamente a cada ordem de serviço.
+
 ---
 
 ## 6. Catálogo de ações
@@ -201,6 +251,29 @@ modelo da tabela e dois exemplos preenchidos.
 [tabela: nome · entrada · saída · é reversível? · risco se
 errar — ações de leitura e de escrita]
 
+| Ação | Entrada | Saída | É reversível? | Risco se errar |
+|---|---|---|---|---|
+| Consultar a leitura atual dos sensores | id da máquina | temperatura, rotação, torque, desgaste da ferramenta | Sim — só lê | Leitura desatualizada ou sensor com falha leva a classificar o risco errado |
+| Consultar o histórico de falhas da máquina | id da máquina | falhas anteriores, datas, causas | Sim — só lê | Histórico incompleto subestima o risco real |
+| Ler a descrição da intervenção na ordem de serviço | texto da ordem de serviço | tipo de serviço, componentes envolvidos (há instalação elétrica? trabalho em altura?) | Sim — só lê | Não detectar que há trabalho elétrico ou em altura aponta a NR errada |
+| Consultar as normas regulamentares aplicáveis (NR-10/12/35) | tipo de intervenção | trechos e exigências aplicáveis | Sim — só lê | Norma errada ou desatualizada orienta um procedimento inseguro |
+| Classificar o nível de risco de falha | leituras de sensores + histórico de falhas | nível (baixo/médio/alto) + justificativa | Sim — é uma classificação, pode ser revisada | Falso "baixo" deixa uma máquina de risco real operando sem bloqueio — o erro mais caro do domínio |
+| Recomendar bloqueio e etiquetagem (LOTO) antes da intervenção | classificação de risco + normas aplicáveis | recomendação registrada na OS (bloquear / não bloquear) | Parcialmente — a recomendação pode ser corrigida depois, mas se o técnico já começou a intervenção sem bloqueio por confiar numa recomendação errada de "não precisa", o que acontecer nesse intervalo não se desfaz | Dispensar o bloqueio quando era necessário expõe o técnico a choque elétrico, esmagamento, etc. |
+| Escalar a ordem para o supervisor de segurança | ordem de serviço + classificação + motivo (risco alto ou confiança baixa) | notificação enviada ao supervisor | Não — a notificação chegou, não se recolhe | Escalar demais gera fadiga de alarme; escalar de menos deixa um risco real sem segunda avaliação |
+| Apresentar a avaliação e a recomendação ao técnico | classificação + normas aplicáveis + recomendação de LOTO | texto com justificativa apresentado ao técnico | Não — a informação errada já pode ter pautado a decisão do técnico antes de qualquer correção | Recomendação mal escrita ou mal priorizada leva o técnico a decidir errado mesmo com dados certos |
+
+**Quem executa cada ação:** as quatro leituras e a classificação de risco,
+o agente executa sozinho — são consulta e cálculo, sem efeito no mundo.
+"Recomendar LOTO" e "escalar ao supervisor" também são disparadas pelo
+agente sozinho, mas são **recomendação**, não execução: quem decide e age
+fisicamente continua sendo o técnico (`dominio.md`, item 2).
+
+**O que o agente JAMAIS executa sozinho:** bloquear/etiquetar fisicamente a
+máquina (LOTO) ou liberar a máquina para operação. O agente recomenda; a
+execução e a decisão final são sempre do técnico — é a ação irreversível de
+risco alto do domínio, e fica fora do alcance dele. Esta linha alimenta a
+seção 5 (Restrições).
+
 ---
 
 ## 7. Formulação por busca
@@ -215,12 +288,183 @@ Perguntas que guiam o preenchimento:
 -->
 **Quando se preenche:** no Laboratório 03, sábado à tarde (encontro 2).
 
+**Classe modificada:**
+
+*consultas_ams.py*
+
+```python
+"""Subproblema 2 do catálogo: a sequência de consultas para responder uma pergunta.
+
+A formulação vem do plano da D2, seção 9 (catálogo de subproblemas):
+Estado: o que já se sabe. Ação: consultar uma fonte. Custo: latência da
+consulta. Objetivo: ter todos os dados que a resposta exige.
+
+O sabor do caso: uma fonte costuma entregar VÁRIOS fatos de uma vez. O
+caminho ótimo pode ser uma fonte cara que fecha tudo, ou duas baratas que
+juntas fecham — e é exatamente esse tipo de escolha que a busca compara.
+Uma consulta repetida (todos os fatos já sabidos) é permitida, custa a
+latência inteira e não muda o estado: a busca em grafo a descarta.
+
+Os dados são inventados e moram nas constantes do módulo — troque pelos do
+seu domínio (lab-03) sem tocar na classe.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Fonte:
+    """Uma fonte que pode ser consultada, e o que ela entrega."""
+
+    nome: str
+    latencia: float              # custo da consulta (segundos)
+    fornece: tuple[str, ...]     # os fatos que a consulta devolve
+
+# A pergunta: "a máquina X pode ser liberada hoje, sem risco?" — quatro
+# fatos, cinco fontes. O caminho ótimo é a combinação de fontes baratas; a
+# fonte única (auditoria completa) é a mais cara.
+FATOS_PEQUENOS: frozenset[str] = frozenset({
+    "histórico de falhas da máquina",
+    "normas regulamentares aplicáveis (NR)",
+    "leitura atual dos sensores",
+    "manutenção preventiva programada",
+})
+
+FONTES_PEQUENAS: tuple[Fonte, ...] = (
+    Fonte("painel de sensores — leitura atual", 1.2, ("leitura atual dos sensores",)),
+    Fonte("sistema de manutenção — status", 2.0, ("normas regulamentares aplicáveis (NR)", "manutenção preventiva programada")),
+    Fonte("histórico de falhas (sistema)", 6.0, ("histórico de falhas da máquina",)),
+    Fonte("relatório semanal de manutenção", 4.5, ("histórico de falhas da máquina",
+                                                  "leitura atual dos sensores")),
+    Fonte("auditoria completa de manutenção", 15.0, ("histórico de falhas da máquina",
+                                         "normas regulamentares aplicáveis (NR)",
+                                         "leitura atual dos sensores",
+                                         "manutenção preventiva programada")),
+)
+
+# A pergunta maior: "a máquina L14720 pode ser liberada para operação,
+# inspecionada antes, ou precisa parar para manutenção?" — oito fatos,
+# catorze fontes. A maioria das fontes é barata e específica; só a
+# consultoria externa cobre tudo de uma vez, por um preço bem mais alto do
+# que combinar as fontes baratas.
+FATOS_MAIORES: frozenset[str] = frozenset({
+    "histórico de intervenções anteriores",
+    "leitura atual de vibração",
+    "leitura atual de temperatura do mancal",
+    "tempo decorrido desde a última manutenção",
+    "tendência das últimas leituras de vibração",
+    "pendências abertas na ordem de serviço",
+    "disponibilidade de peça de reposição",
+    "prazo de entrega da peça de reposição",
+})
+FONTES_MAIORES: tuple[Fonte, ...] = (
+    Fonte("sistema de manutenção — histórico de intervenções", 0.9, ("histórico de intervenções anteriores",)),
+    Fonte("sensor de vibração — leitura atual", 1.1, ("leitura atual de vibração",)),
+    Fonte("sensor de temperatura — leitura atual", 1.3, ("leitura atual de temperatura do mancal",)),
+    Fonte("registro de manutenção — última intervenção", 0.7, ("tempo decorrido desde a última manutenção",)),
+    Fonte("ordem de serviço — pendências abertas", 1.0, ("pendências abertas na ordem de serviço",)),
+    Fonte("almoxarifado — peças de reposição", 1.2, ("disponibilidade de peça de reposição",)),
+    Fonte("portal do fornecedor de peças", 3.5, ("prazo de entrega da peça de reposição",)),
+    Fonte("robô de email da manutenção", 2.8, ("disponibilidade de peça de reposição",
+                                                "prazo de entrega da peça de reposição")),
+    Fonte("sistema de manutenção — histórico completo", 4.0, ("histórico de intervenções anteriores",
+                                                               "tendência das últimas leituras de vibração")),
+    Fonte("relatório de condição da máquina", 5.0, ("leitura atual de vibração",
+                                                     "pendências abertas na ordem de serviço")),
+    Fonte("painel de monitoramento preditivo", 6.5, ("leitura atual de temperatura do mancal",
+                                 "tempo decorrido desde a última manutenção",
+                                 "tendência das últimas leituras de vibração")),
+    Fonte("sistema de manutenção — módulo completo", 9.0, ("histórico de intervenções anteriores",
+                                                          "tendência das últimas leituras de vibração",
+                                                          "tempo decorrido desde a última manutenção")),
+    Fonte("reunião com o técnico responsável", 14.0, ("leitura atual de vibração",
+                                                    "leitura atual de temperatura do mancal",
+                                                    "pendências abertas na ordem de serviço",
+                                                    "disponibilidade de peça de reposição",
+                                                    "prazo de entrega da peça de reposição")),
+    Fonte("consultoria externa de engenharia de manutenção", 22.0, ("histórico de intervenções anteriores",
+                                                       "leitura atual de vibração",
+                                                       "leitura atual de temperatura do mancal",
+                                                       "tempo decorrido desde a última manutenção",
+                                                       "tendência das últimas leituras de vibração",
+                                                       "pendências abertas na ordem de serviço",
+                                                       "disponibilidade de peça de reposição",
+                                                       "prazo de entrega da peça de reposição")),
+)
+
+class Consultas:
+    """O problema de busca: que fontes consultar, em que ordem.
+
+    O estado é o conjunto de fatos já sabidos, como tupla ordenada —
+    estados com os mesmos fatos são o mesmo hash, não importa a ordem
+    das consultas.
+    """
+
+    def __init__(self, fatos_necessarios: frozenset[str], fontes: tuple[Fonte, ...]):
+        self.fatos_necessarios = fatos_necessarios
+        self.fontes = fontes
+        self._por_nome = {f.nome: f for f in fontes}
+        self.estado_inicial: tuple[str, ...] = ()
+
+    def acoes(self, estado: tuple[str, ...]) -> list[str]:
+        return [f.nome for f in self.fontes]
+
+    def transicao(self, estado: tuple[str, ...], acao: str) -> tuple[str, ...]:
+        # o estado é um CONJUNTO de fatos: consultar fonte que só repete o
+        # que já se sabe devolve o MESMO estado — sem o set(), cada consulta
+        # redundante criaria um estado novo com o fato duplicado.
+        return tuple(sorted(set(estado) | set(self._por_nome[acao].fornece)))
+
+    def objetivo(self, estado: tuple[str, ...]) -> bool:
+        return self.fatos_necessarios.issubset(estado)
+
+    def custo(self, estado: tuple[str, ...], acao: str, estado_seguinte: tuple[str, ...]) -> float:
+        return self._por_nome[acao].latencia
+
+    def heuristica_admissivel(self, estado: tuple[str, ...]) -> float:
+        """A latência da consulta mais barata que ainda entrega um fato faltante.
+
+        Admissível: enquanto faltar fato, é obrigatório consultar PELO MENOS
+        uma fonte que ajude — e nenhuma consulta custa menos do que a menor
+        latência útil. Ignora quantas consultas ainda virão depois dessa.
+        """
+        sabidos = set(estado)
+        faltantes = self.fatos_necessarios - sabidos
+        if not faltantes:
+            return 0.0
+        uteis = [f.latencia for f in self.fontes
+                 if set(f.fornece) & faltantes]
+        return min(uteis)
+
+    def heuristica_inadmissivel(self, estado: tuple[str, ...]) -> float:
+        """Pior caso por fato: cada fato que falta vai custar a consulta mais lenta.
+
+        NÃO é admissível, e é tentadora por isso: "cada dado que falta é uma
+        consulta, e consulta pode demorar o máximo" é o cálculo pessimista
+        que se escreve de primeira. Ela ignora que uma consulta única entrega
+        vários fatos — e por isso faz a fonte cara que resolve tudo parecer
+        o caminho mais promissor: o A* com ela mergulha na consulta lenta e
+        devolve caminho mais caro que o ótimo (o lab-05 mede o dano).
+        """
+        sabidos = set(estado)
+        faltantes = len(self.fatos_necessarios - sabidos)
+        pior_latencia = max(f.latencia for f in self.fontes)
+        return float(faltantes * pior_latencia)
+
+
+PEQUENA = Consultas(FATOS_PEQUENOS, FONTES_PEQUENAS)
+MAIOR = Consultas(FATOS_MAIORES, FONTES_MAIORES)
 ```
-(ams) PS C:\temp\UTFPR\Projeto-AMS> uv run .\D02\D2-03-formular-como-busca\verificar-formulacao.py         
-verificar-formulacao — teste de sanidade da formulação de busca
-(sem argumentos: rodando sobre o catálogo — aponte o seu com arquivo.py:ATRIBUTO)
 
-— diagnostico.PEQUENA
+
+**Resultado - Saída:**
+```bash
+(ams) PS C:\temp\UTFPR\Projeto-AMS\D02\D2-03-formular-como-busca> uv run python verificar-formulacao.py  "comum\problemas\consultas_ams.py:PEQUENA" "comum\problemas\consultas_ams.py:MAIOR"   
+verificar-formulacao — teste de sanidade da formulação de busca                            
+                                             
+— comum\problemas\consultas_ams.py:PEQUENA
   1. estado é hashable ✅
   2. transição é função ✅
   3. ações estáveis na ordem ✅
@@ -229,43 +473,7 @@ verificar-formulacao — teste de sanidade da formulação de busca
   6. estado não guarda o caminho ✅
   resumo: 6 ✅ · 0 ⚠️ · 0 ❌
 
-— diagnostico.MAIOR
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— consultas.PEQUENA
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— consultas.MAIOR
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— conformidade.PEQUENA
-  1. estado é hashable ✅
-  2. transição é função ✅
-  3. ações estáveis na ordem ✅
-  4. custo é positivo ou zero ✅
-  5. objetivo é alcançável ✅
-  6. estado não guarda o caminho ✅
-  resumo: 6 ✅ · 0 ⚠️ · 0 ❌
-
-— conformidade.MAIOR
+— comum\problemas\consultas_ams.py:MAIOR
   1. estado é hashable ✅
   2. transição é função ✅
   3. ações estáveis na ordem ✅
