@@ -39,15 +39,15 @@ FATOS_PEQUENOS: frozenset[str] = frozenset({
 })
 
 FONTES_PEQUENAS: tuple[Fonte, ...] = (
-    Fonte("painel de sensores — leitura atual", 1.2, ("leitura atual dos sensores",)),
-    Fonte("sistema de manutenção — status", 2.0, ("normas regulamentares aplicáveis (NR)", "manutenção preventiva programada")),
-    Fonte("histórico de falhas (sistema)", 6.0, ("histórico de falhas da máquina",)),
-    Fonte("relatório semanal de manutenção", 4.5, ("histórico de falhas da máquina",
-                                                  "leitura atual dos sensores")),
-    Fonte("auditoria completa de manutenção", 15.0, ("histórico de falhas da máquina",
-                                         "normas regulamentares aplicáveis (NR)",
-                                         "leitura atual dos sensores",
-                                         "manutenção preventiva programada")),
+    Fonte("painel de sensores — leitura atual", 1.2 , ("leitura atual dos sensores",)),
+    Fonte("sistema de manutenção — status"    , 2.0 , ("normas regulamentares aplicáveis (NR)", "manutenção preventiva programada")),
+    Fonte("histórico de falhas (sistema)"     , 6.0 , ("histórico de falhas da máquina",)),
+    Fonte("relatório semanal de manutenção"   , 4.5 , ("histórico de falhas da máquina", "leitura atual dos sensores")),
+    Fonte("auditoria completa de manutenção"  , 15.0, (
+                "histórico de falhas da máquina"
+                , "normas regulamentares aplicáveis (NR)"
+                , "leitura atual dos sensores"
+                , "manutenção preventiva programada")),
 )
 
 # A pergunta maior: "a máquina L14720 pode ser liberada para operação,
@@ -67,37 +67,38 @@ FATOS_MAIORES: frozenset[str] = frozenset({
 })
 FONTES_MAIORES: tuple[Fonte, ...] = (
     Fonte("sistema de manutenção — histórico de intervenções", 0.9, ("histórico de intervenções anteriores",)),
-    Fonte("sensor de vibração — leitura atual", 1.1, ("leitura atual de vibração",)),
-    Fonte("sensor de temperatura — leitura atual", 1.3, ("leitura atual de temperatura do mancal",)),
-    Fonte("registro de manutenção — última intervenção", 0.7, ("tempo decorrido desde a última manutenção",)),
-    Fonte("ordem de serviço — pendências abertas", 1.0, ("pendências abertas na ordem de serviço",)),
-    Fonte("almoxarifado — peças de reposição", 1.2, ("disponibilidade de peça de reposição",)),
-    Fonte("portal do fornecedor de peças", 3.5, ("prazo de entrega da peça de reposição",)),
-    Fonte("robô de email da manutenção", 2.8, ("disponibilidade de peça de reposição",
-                                                "prazo de entrega da peça de reposição")),
-    Fonte("sistema de manutenção — histórico completo", 4.0, ("histórico de intervenções anteriores",
-                                                               "tendência das últimas leituras de vibração")),
-    Fonte("relatório de condição da máquina", 5.0, ("leitura atual de vibração",
-                                                     "pendências abertas na ordem de serviço")),
-    Fonte("painel de monitoramento preditivo", 6.5, ("leitura atual de temperatura do mancal",
-                                 "tempo decorrido desde a última manutenção",
-                                 "tendência das últimas leituras de vibração")),
-    Fonte("sistema de manutenção — módulo completo", 9.0, ("histórico de intervenções anteriores",
-                                                          "tendência das últimas leituras de vibração",
-                                                          "tempo decorrido desde a última manutenção")),
-    Fonte("reunião com o técnico responsável", 14.0, ("leitura atual de vibração",
-                                                    "leitura atual de temperatura do mancal",
-                                                    "pendências abertas na ordem de serviço",
-                                                    "disponibilidade de peça de reposição",
-                                                    "prazo de entrega da peça de reposição")),
-    Fonte("consultoria externa de engenharia de manutenção", 22.0, ("histórico de intervenções anteriores",
-                                                       "leitura atual de vibração",
-                                                       "leitura atual de temperatura do mancal",
-                                                       "tempo decorrido desde a última manutenção",
-                                                       "tendência das últimas leituras de vibração",
-                                                       "pendências abertas na ordem de serviço",
-                                                       "disponibilidade de peça de reposição",
-                                                       "prazo de entrega da peça de reposição")),
+    Fonte("sensor de vibração — leitura atual"               , 1.1, ("leitura atual de vibração",)),
+    Fonte("sensor de temperatura — leitura atual"            , 1.3, ("leitura atual de temperatura do mancal",)),
+    Fonte("registro de manutenção — última intervenção"      , 0.7, ("tempo decorrido desde a última manutenção",)),
+    Fonte("ordem de serviço — pendências abertas"            , 1.0, ("pendências abertas na ordem de serviço",)),
+    Fonte("almoxarifado — peças de reposição"                , 1.2, ("disponibilidade de peça de reposição",)),
+    Fonte("portal do fornecedor de peças"                    , 3.5, ("prazo de entrega da peça de reposição",)),
+    Fonte("robô de email da manutenção"                      , 2.8, ("disponibilidade de peça de reposição", "prazo de entrega da peça de reposição")),
+    Fonte("sistema de manutenção — histórico completo"       , 4.0, ("histórico de intervenções anteriores", "tendência das últimas leituras de vibração")),
+    Fonte("relatório de condição da máquina"                 , 5.0, ("leitura atual de vibração", "pendências abertas na ordem de serviço")),
+    Fonte("painel de monitoramento preditivo"                , 6.5, (
+                "leitura atual de temperatura do mancal"
+                , "tempo decorrido desde a última manutenção"
+                , "tendência das últimas leituras de vibração")),
+    Fonte("sistema de manutenção — módulo completo"          , 9.0, (
+                "histórico de intervenções anteriores"
+                , "tendência das últimas leituras de vibração"
+                , "tempo decorrido desde a última manutenção")),
+    Fonte("reunião com o técnico responsável"                , 14.0, (
+                "leitura atual de vibração"
+                , "leitura atual de temperatura do mancal"
+                , "pendências abertas na ordem de serviço"
+                , "disponibilidade de peça de reposição"
+                , "prazo de entrega da peça de reposição")),
+    Fonte("consultoria externa de engenharia de manutenção"  , 22.0, (
+                "histórico de intervenções anteriores"
+                , "leitura atual de vibração"
+                , "leitura atual de temperatura do mancal"
+                , "tempo decorrido desde a última manutenção"
+                , "tendência das últimas leituras de vibração"
+                , "pendências abertas na ordem de serviço"
+                , "disponibilidade de peça de reposição"
+                , "prazo de entrega da peça de reposição")),
 )
 
 class Consultas:

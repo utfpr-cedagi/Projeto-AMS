@@ -55,16 +55,17 @@ regras documentadas. É o achado mais forte pra "caso atípico" real.
 | `risco` *(coluna nova)* | ver tabela de categorias acima | derivada dos 4 gatilhos reais |
 | `dificuldade` *(coluna nova)* | ver tabela de categorias acima | derivada dos 4 gatilhos reais |
 
-## Aviso: limiares de `esqueleto.py` ainda não recalibrados
+## Recalibração de `esqueleto.py`: concluída
 
-`LIMITE_TEMPERATURA = 78.0` e `LIMITE_VIBRACAO = 7.0`, em `esqueleto.py`,
-foram calibrados pra escala da reserva sintética. Neste arquivo,
-`temperatura_c` fica toda entre 33–38°C (bem abaixo de 78) e
-`vibracao_mm_s` entre 2,2–11,3 (cruza o 7,0 só em 2 casos: A04 e A11).
-Rodar `decidir()` como está hoje vai, quase sempre, decidir
-`seguir_operando` — os limiares precisam ser recalibrados pra escala real
-antes da medição em `medir.py` fazer sentido. Isso fica para um passo
-seguinte.
+Os limiares originais do pacote (`LIMITE_TEMPERATURA = 78.0` e
+`LIMITE_VIBRACAO = 7.0`) foram calibrados pra escala da reserva sintética —
+fora de escala pra este arquivo, onde `temperatura_c` fica toda entre
+33–38°C (nunca perto de 78). `LIMITE_TEMPERATURA` foi removida e
+substituída por `LIMITE_DESGASTE = 150.0` sobre `horas_desde_manutencao`
+(o gatilho real de TWF, que começa a sortear falha a partir de 200 min de
+desgaste acumulado). `LIMITE_VIBRACAO = 7.0` foi mantido, porque a faixa
+do proxy derivado já cai nessa escala por construção. Justificativa
+completa e números da medição em `RESUMO-LAB06.md` §5.
 
 ## Licença e reúso
 

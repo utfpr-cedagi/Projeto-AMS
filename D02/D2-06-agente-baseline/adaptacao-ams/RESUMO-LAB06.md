@@ -247,7 +247,7 @@ que foi produzido neste trabalho (dados e análise) está em
 | Arquivo | O que é |
 |---|---|
 | `casos-lab-06-v2.csv` | amostra final usada, curada pelos gatilhos reais |
-| `FONTE-casos-lab-06-v2.md` | procedência da v2: UDIs por categoria, mapeamento de colunas, aviso sobre limiares |
+| `FONTE-casos-lab-06-v2.md` | procedência da v2: UDIs por categoria, mapeamento de colunas, nota sobre a recalibração de limiares |
 | `analise_baseline.md` | métrica primária, análise de erro, justificativa da recalibração, explicação das 4 falhas esperadas do `teste.py` |
 | `RESUMO-LAB06.md` | este arquivo |
 
