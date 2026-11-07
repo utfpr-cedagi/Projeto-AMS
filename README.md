@@ -34,7 +34,6 @@ máquina antes da intervenção. A decisão final é do técnico — o sistema a
 | Log | `src/ams/log.py` | logging estruturado em JSON |
 | Chamada do modelo | `src/ams/llm.py` | requisição REST com resposta estruturada, novas tentativas e modo sem rede |
 | Cliente | `src/ams/cliente_llm.py` | lê ordens → chama o modelo → valida → registra, em lote concorrente |
-| Geração de casos | `src/ams/gerador_casos.py` | amostra novos lotes de casos reais do AI4I2020 por categoria de risco/dificuldade, sempre com de-para de proveniência |
 | Exploração | `notebooks/01-eda.ipynb` | as oito perguntas respondidas com gráfico e conclusão |
 | API local | `src/ams/api.py` | FastAPI com `/docs` (janela de exploração; documentada no `README-API.md`) |
 
@@ -82,8 +81,7 @@ validação, mesmo log. O detalhe de cada avaliação fica em
 ├── data/
 │   ├── raw/               # baixado (fora do Git, regenerado pelo script)
 │   ├── amostra/           # 200 linhas versionadas — o projeto roda sem download
-│   ├── fixtures/          # respostas gravadas do modelo (modo sem rede)
-│   └── casos-gerados/     # lotes de casos novos, gerados por `ams.gerador_casos`
+│   └── fixtures/          # respostas gravadas do modelo (modo sem rede)
 ├── receitas/              # download dos datasets dos demais domínios do curso
 └── tests/                 # pytest — tudo sem rede
 ```

@@ -32,16 +32,10 @@ andamento (`D3-01`, `D3-02`): o autor preferiu manter a estrutura que o
 professor passou. `adaptacao-ams/` continua sendo uma particularidade só de
 `D2-06`, não um padrão do projeto.
 
-O que fica fora de qualquer `D3-0N-slug/`, solto na raiz de `D03/`, é
-produção própria por natureza (não há pacote de curso nesse nível):
-
-- `protocolo.md` — diário de execução entre laboratórios (saídas de
-  terminal capturadas, organizadas por `## Lab 0N`).
-
-`data/casos-gerados/` (fora de `D03/`, em `data/` na raiz do repo) — lotes
-de casos novos gerados por `ams.gerador_casos`, reusáveis por qualquer
-disciplina futura, não só D03. Esse, sim, saiu da raiz solta de `D03/` por
-não ser conteúdo de disciplina nenhuma.
+O diário de execução entre laboratórios que ficava solto em
+`D03/protocolo.md` foi absorvido pelos notebooks de protocolo estatístico
+em [`extras-pessoal/notebooks/`](../extras-pessoal/notebooks/) — hoje não
+há mais nada solto na raiz de `D03/` fora dos `D3-0N-slug/`.
 
 ## `dados/` de cada lab
 

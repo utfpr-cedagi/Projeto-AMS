@@ -6,16 +6,21 @@ o restante da análise (estilo do `01-eda.ipynb`); este script roda à parte
 porque Plotly não participa do ambiente de execução do notebook.
 
 Uso:
-    .venv/Scripts/python.exe notebooks/extra-pessoal/gerar_html_protocolo_estatistico.py
+    .venv/Scripts/python.exe extras-pessoal/notebooks/gerar_html_protocolo_estatistico.py
 """
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from ams.dados import carregar, preparar
-from ams.gerador_casos import (
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+
+from ams.dados import carregar, preparar  # noqa: E402
+from gerador_casos import (  # noqa: E402
     HDF_LIMITE_DELTA,
     HDF_LIMITE_ROTACAO,
     OSF_LIMITES,

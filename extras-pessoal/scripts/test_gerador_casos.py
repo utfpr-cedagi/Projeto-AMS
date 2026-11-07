@@ -16,7 +16,7 @@ from conftest import LINHA_VALIDA, gerar_csv
 from pandas.testing import assert_frame_equal
 
 from ams.dados import carregar
-from ams.gerador_casos import (
+from gerador_casos import (
     COLUNAS_CASO,
     COLUNAS_DEPARA,
     ErroGeracao,

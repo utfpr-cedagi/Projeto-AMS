@@ -80,9 +80,10 @@ desambiguação por busca combinatória sobre a fórmula de `vibracao_mm_s`
 (ela depende da mediana de RPM/torque das 30 linhas, então o UDI certo é o
 único que reproduz exatamente os valores gravados no CSV — erro 0,0 em
 todas as 30 linhas, o que confirma a reconstrução). Lotes gerados depois
-deste (ver `data/casos-gerados/`) usam `ams.gerador_casos`, que grava o
-de-para automaticamente — essa reconstrução manual não deve ser necessária
-de novo.
+deste (ver `extras-pessoal/data/casos-gerados/`) usam
+`extras-pessoal/scripts/gerador_casos.py`, que grava o de-para
+automaticamente — essa reconstrução manual não deve ser necessária de
+novo.
 
 ## Licença e reúso
 

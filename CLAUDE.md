@@ -21,11 +21,17 @@ Detalhes completos em [`dominio.md`](dominio.md).
   dados, análise, vetores, log, cliente LLM, API FastAPI). Tabela de camadas
   no [`README.md`](README.md).
 - [`notebooks/01-eda.ipynb`](notebooks/01-eda.ipynb) — exploração de dados (D1).
-- `data/` — `amostra/` (200 linhas versionadas), `fixtures/` (respostas do
-  modelo gravadas p/ modo offline) e `casos-gerados/` (lotes novos, gerados
-  por `ams.gerador_casos`, reusáveis por qualquer disciplina) são
-  versionados; `raw/` não é.
-- `tests/` — pytest sobre `src/ams`, nunca toca rede (69 testes).
+- [`extras-pessoal/`](extras-pessoal/) — produção própria de estudo (notebooks,
+  scripts, dados), fora do fluxo de entrega: nunca é copiada pra uma branch
+  `entrega/D0X_EY` (o fluxo abaixo só traz o que é copiado explicitamente).
+  Mesma lógica de separação do `D02/D2-06-agente-baseline/adaptacao-ams/`,
+  mas pro repo inteiro, não só um `D0N/`. Inclui `scripts/gerador_casos.py`
+  (ferramenta pessoal pra gerar lotes de casos rotulados, não original do
+  curso — por isso fora de `src/ams/`, com teste próprio rodado à parte,
+  fora da suíte oficial) e `data/casos-gerados/` (lotes gerados por ele).
+- `data/` — `amostra/` (200 linhas versionadas) e `fixtures/` (respostas do
+  modelo gravadas p/ modo offline) são versionados; `raw/` não é.
+- `tests/` — pytest sobre `src/ams`, nunca toca rede (76 testes).
 - [`agent-spec.md`](agent-spec.md) — **documento vivo**: cresce uma seção
   por laboratório/disciplina (PEAS, dimensões do ambiente, tipo de agente,
   formulação por busca, ...). É o principal artefato de entrega do curso —
@@ -50,7 +56,7 @@ Detalhes completos em [`dominio.md`](dominio.md).
 ```powershell
 .venv\Scripts\python.exe scripts\baixar-dados.py      # baixa o dataset (opcional — já tem amostra)
 .venv\Scripts\python.exe -m ams.cliente_llm            # avalia 20 ordens de serviço
-.venv\Scripts\python.exe -m pytest                     # 69 testes, sem rede
+.venv\Scripts\python.exe -m pytest                     # 76 testes, sem rede
 uvicorn ams.api:app --reload                            # API local, /docs
 ```
 

@@ -21,6 +21,7 @@ dependencies = [
   # Visualização
   "matplotlib==3.11.1",
   "seaborn==0.13.2",
+  "plotly==7.1.0",
 
   # Machine learning (apenas o contrato fit/predict na D1)
   "scikit-learn==1.9.0",

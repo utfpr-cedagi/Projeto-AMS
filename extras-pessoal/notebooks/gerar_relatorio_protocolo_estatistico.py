@@ -10,14 +10,15 @@ prosa dizendo uma coisa e a tabela dizendo outra. Aqui, sempre que o dataset
 mudar de novo, basta rodar de novo.
 
 Uso:
-    .venv/Scripts/python.exe notebooks/extra-pessoal/gerar_relatorio_protocolo_estatistico.py            # gera os dois (amostra e raw)
-    .venv/Scripts/python.exe notebooks/extra-pessoal/gerar_relatorio_protocolo_estatistico.py --fonte raw
-    .venv/Scripts/python.exe notebooks/extra-pessoal/gerar_relatorio_protocolo_estatistico.py --fonte amostra
+    .venv/Scripts/python.exe extras-pessoal/notebooks/gerar_relatorio_protocolo_estatistico.py            # gera os dois (amostra e raw)
+    .venv/Scripts/python.exe extras-pessoal/notebooks/gerar_relatorio_protocolo_estatistico.py --fonte raw
+    .venv/Scripts/python.exe extras-pessoal/notebooks/gerar_relatorio_protocolo_estatistico.py --fonte amostra
 """
 
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -25,7 +26,10 @@ from scipy import stats
 
 from ams import analise
 from ams.dados import RAIZ_DO_PACOTE, Dataset, carregar, preparar
-from ams.gerador_casos import (
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+
+from gerador_casos import (  # noqa: E402
     HDF_LIMITE_DELTA,
     HDF_LIMITE_ROTACAO,
     MARGEM_DIFICIL_HDF_DELTA,
@@ -414,7 +418,7 @@ def secao7_mecanismos(df: pd.DataFrame) -> tuple[dict, list[str]]:
     linhas = [
         "## 7 — Os cinco mecanismos de falha, quantificados",
         "",
-        "Limiares oficiais de `ams.gerador_casos`, testados como regra preditiva contra a flag real "
+        "Limiares oficiais de `gerador_casos` (extras-pessoal/scripts), testados como regra preditiva contra a flag real "
         "de cada modo.",
         "",
         "| mecanismo | recall | precisão | casos reais | casos previstos pela regra |",
@@ -511,7 +515,7 @@ def secao8_classificador(df: pd.DataFrame, mecanismos: dict) -> tuple[dict, list
         "## 8 — Proposta de classificador agregado (baixo / médio / alto)",
         "",
         "`alto`: TWF, HDF, PWF ou OSF sinalizados. `médio`: nenhum limiar cruzado, mas dentro da margem "
-        "de \"caso difícil\" de `ams.gerador_casos`. `baixo`: o resto. Critérios de `agent-spec.md` §4: "
+        "de \"caso difícil\" de `gerador_casos` (extras-pessoal/scripts). `baixo`: o resto. Critérios de `agent-spec.md` §4: "
         f"recall e precisão da classe alto ≥ {int(CRITERIO_RECALL_ALTO*100)}%, taxa de \"alto\" "
         f"classificado como \"baixo\" ≤ {int(CRITERIO_TAXA_ALTO_PARA_BAIXO*100)}%.",
         "",

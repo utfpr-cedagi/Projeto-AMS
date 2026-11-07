@@ -2,11 +2,12 @@
 
 **Arquivo:** `casos-d03-lote1.csv` — 30 casos novos, gerados a partir do
 dataset real *AI4I 2020 Predictive Maintenance* (`data/raw/ai4i2020.csv`,
-10.000 registros) pelo módulo [`ams.gerador_casos`](../../src/ams/gerador_casos.py),
-pra uso em laboratórios de qualquer disciplina que precisem de um lote de
-casos rotulados — por isso o arquivo fica em `data/casos-gerados/`, junto
-das outras pastas de dados do projeto (`data/amostra/`, `data/fixtures/`),
-e não dentro de uma pasta de disciplina/laboratório específica.
+10.000 registros) pelo script pessoal
+[`gerador_casos.py`](../../scripts/gerador_casos.py) — ferramenta própria,
+não original do curso, por isso fora de `src/ams/`. Útil pra gerar lotes
+de casos rotulados pra qualquer disciplina, mas o lote em si fica aqui, em
+`extras-pessoal/data/casos-gerados/`, como material de estudo pessoal —
+não é dado oficial do projeto (esses são `data/amostra/`, `data/fixtures/`).
 
 Ainda não foi medido contra nenhum agente — ao contrário de
 `casos-lab-06-v2.csv` (D02), que já tem `analise_baseline.md` com a métrica
@@ -16,7 +17,7 @@ do `baseline.py`.
 
 Mesmas 4 categorias e os mesmos 5 gatilhos de falha documentados pela UCI
 (TWF, HDF, PWF, OSF, RNF) usados em `casos-lab-06-v2.csv` — ver
-[`D02/D2-06-agente-baseline/adaptacao-ams/FONTE-casos-lab-06-v2.md`](../../D02/D2-06-agente-baseline/adaptacao-ams/FONTE-casos-lab-06-v2.md)
+[`D02/D2-06-agente-baseline/adaptacao-ams/FONTE-casos-lab-06-v2.md`](../../../D02/D2-06-agente-baseline/adaptacao-ams/FONTE-casos-lab-06-v2.md)
 para a explicação completa de cada gatilho e dos limiares. A diferença é
 que aqui a amostragem não foi manual: `gerar_lote()` filtra o dataset bruto
 em pools por categoria/mecanismo e sorteia (com seed fixa, reprodutível).
@@ -48,23 +49,23 @@ categorias.
 `depara-casos-d03-lote1.csv` — uma linha por `id_caso`, com o UDI de
 origem em `data/raw/ai4i2020.csv`, `product_id`, `categoria`, `mecanismo`,
 `risco` e `dificuldade`. Gerado automaticamente por `gerar_lote()` — todo
-lote novo feito com `ams.gerador_casos` grava este arquivo junto, nunca só
+lote novo feito com `gerador_casos.py` grava este arquivo junto, nunca só
 o CSV de casos (sem ele, o rastro até o dataset bruto se perde, como
 aconteceu com `casos-lab-06-v2.csv` — ver nota na FONTE daquele lote).
 
 ## Como reproduzir / gerar o próximo lote
 
 ```powershell
-.venv\Scripts\python.exe -m ams.gerador_casos `
-  --saida-casos data\casos-gerados\casos-d03-lote1.csv `
-  --saida-depara data\casos-gerados\depara-casos-d03-lote1.csv `
+.venv\Scripts\python.exe extras-pessoal\scripts\gerador_casos.py `
+  --saida-casos extras-pessoal\data\casos-gerados\casos-d03-lote1.csv `
+  --saida-depara extras-pessoal\data\casos-gerados\depara-casos-d03-lote1.csv `
   --excluir-depara D02\D2-06-agente-baseline\adaptacao-ams\depara-casos-lab-06-v2.csv `
   --prefixo B --data-inicio 2026-05-01 --seed 42
 ```
 
 Pra um próximo lote (ex.: D04), passe também `--excluir-depara
-data\casos-gerados\depara-casos-d03-lote1.csv` além do de-para do lab-06,
-pra nunca reusar UDI de nenhum lote anterior.
+extras-pessoal\data\casos-gerados\depara-casos-d03-lote1.csv` além do
+de-para do lab-06, pra nunca reusar UDI de nenhum lote anterior.
 
 ## Licença e reúso
 
