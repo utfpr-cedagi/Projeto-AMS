@@ -21,8 +21,10 @@ Detalhes completos em [`dominio.md`](dominio.md).
   dados, análise, vetores, log, cliente LLM, API FastAPI). Tabela de camadas
   no [`README.md`](README.md).
 - [`notebooks/01-eda.ipynb`](notebooks/01-eda.ipynb) — exploração de dados (D1).
-- `data/` — `amostra/` (200 linhas versionadas) e `fixtures/` (respostas do
-  modelo gravadas p/ modo offline) são versionados; `raw/` não é.
+- `data/` — `amostra/` (200 linhas versionadas), `fixtures/` (respostas do
+  modelo gravadas p/ modo offline) e `casos-gerados/` (lotes novos, gerados
+  por `ams.gerador_casos`, reusáveis por qualquer disciplina) são
+  versionados; `raw/` não é.
 - `tests/` — pytest sobre `src/ams`, nunca toca rede (69 testes).
 - [`agent-spec.md`](agent-spec.md) — **documento vivo**: cresce uma seção
   por laboratório/disciplina (PEAS, dimensões do ambiente, tipo de agente,
@@ -31,7 +33,17 @@ Detalhes completos em [`dominio.md`](dominio.md).
   "quando se preenche".
 - `D0N/` (ex.: [`D02/`](D02/)) — uma pasta por disciplina, com uma subpasta
   por laboratório (`D2-01-...`, `D2-02-...`). Ver [`D02/CLAUDE.md`](D02/CLAUDE.md)
-  para o padrão dos laboratórios de busca em andamento.
+  para o padrão dos laboratórios de busca em andamento e
+  [`D03/CLAUDE.md`](D03/CLAUDE.md) para a D3.
+- **Curso vs. produção própria:** não é uma convenção única do projeto —
+  cada disciplina decide. `D02/D2-06-agente-baseline/` separa o que veio do
+  pacote (raiz do lab) do que o autor produziu (subpasta `adaptacao-ams/`);
+  os demais laboratórios de D02 e todos os de D03 ficam na estrutura exata
+  que o pacote do professor entrega, sem subpasta — decisão deliberada do
+  autor (tentada e revertida em D03). Arquivos soltos na raiz de `D0N/`,
+  fora de qualquer `D0N-XX/`, são sempre produção própria (não há pacote de
+  curso nesse nível). Detalhes e exceções no `CLAUDE.md` de cada
+  disciplina.
 
 ## Como rodar
 

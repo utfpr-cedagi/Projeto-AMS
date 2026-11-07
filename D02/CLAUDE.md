@@ -101,6 +101,23 @@ colado em `agent-spec.md` §7 também já está na versão corrigida.
   contra o motor, nos três subproblemas do catálogo e na formulação do
   aluno.
 
+## Curso vs. produção própria
+
+Só `D2-06` separa o que veio do pacote (raiz do lab) do que foi produzido
+pelo autor (`adaptacao-ams/`) — é uma particularidade desse lab, não um
+padrão do projeto: o autor considerou estender a subpasta pra D03 e
+decidiu não fazer isso (ver [`D03/CLAUDE.md`](../D03/CLAUDE.md)), preferindo
+manter a estrutura exata do pacote do professor. Os outros laboratórios de
+D02 (`D2-01` a `D2-05`, `D2-07` a `D2-09`) ficam com os dois tipos de
+arquivo misturados na raiz do lab (ex.: `agent-spec_v01.md`/`v02.md` em
+D2-01, `tabela_resultado_01.md` em D2-04/05) — D02 já está entregue em
+`main`, não vale a pena reorganizar retroativamente. Fora do escopo de
+D2-06: `comum/problemas/consultas_ams.py` (D2-03/04/05) é "a adaptação do
+aluno" dentro do catálogo compartilhado, mas precisa continuar dentro de
+`comum/problemas/` em cada lab pro import funcionar — nunca poderia ir
+para uma subpasta `adaptacao-ams/` mesmo que a convenção fosse adotada
+ali.
+
 ## Ressalvas a registrar na análise escrita (lab-04 e seguintes)
 
 - `nos_expandidos` da `profundidade_limitada` conta diferente das outras

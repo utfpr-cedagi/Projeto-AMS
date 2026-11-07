@@ -241,7 +241,7 @@ acima (recall 0,625, precisão 0,50, acerto geral 0,70, os mesmos 9 erros).
 Os arquivos originais do pacote (`enunciado.pdf`, `COMO-USAR-A-
 RESERVA.pdf`, `FONTE.md`, `casos-de-reserva.csv`, `esqueleto.py`,
 `medir.py`, `teste.py`) ficam na raiz de `D02/D2-06-agente-baseline/`. Tudo
-que foi produzido neste trabalho (dados e análise) está em
+que foi produzido neste trabalho (dados, análise e a entrega em si) está em
 `D02/D2-06-agente-baseline/adaptacao-ams/`:
 
 | Arquivo | O que é |
@@ -250,6 +250,8 @@ que foi produzido neste trabalho (dados e análise) está em
 | `depara-casos-lab-06-v2.csv` | UDI de origem de cada `id_caso` em `data/raw/ai4i2020.csv` (reconstruído depois — ver FONTE-casos-lab-06-v2.md) |
 | `FONTE-casos-lab-06-v2.md` | procedência da v2: UDIs por categoria, mapeamento de colunas, nota sobre a recalibração de limiares |
 | `analise_baseline.md` | métrica primária, análise de erro, justificativa da recalibração, explicação das 4 falhas esperadas do `teste.py` |
+| `NOTA-estado-da-frota.md` | nota explicativa sobre a classe `EstadoDaFrota` do `esqueleto.py` |
+| `entrega_frases_lab06.md` | texto de entrega (item 5 da entrega final) |
 | `RESUMO-LAB06.md` | este arquivo |
 
 Fora desta subpasta: `esqueleto.py` tem as regras recalibradas

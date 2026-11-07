@@ -3,10 +3,10 @@
 **Arquivo:** `casos-d03-lote1.csv` — 30 casos novos, gerados a partir do
 dataset real *AI4I 2020 Predictive Maintenance* (`data/raw/ai4i2020.csv`,
 10.000 registros) pelo módulo [`ams.gerador_casos`](../../src/ams/gerador_casos.py),
-pra uso em laboratórios da D03 que precisem de um lote de casos rotulados
-(qual laboratório exatamente ainda não estava definido no momento da
-geração — por isso o arquivo fica em `D03/casos-gerados/`, fora de uma
-subpasta de laboratório específica; mover/renomear quando for atribuído).
+pra uso em laboratórios de qualquer disciplina que precisem de um lote de
+casos rotulados — por isso o arquivo fica em `data/casos-gerados/`, junto
+das outras pastas de dados do projeto (`data/amostra/`, `data/fixtures/`),
+e não dentro de uma pasta de disciplina/laboratório específica.
 
 Ainda não foi medido contra nenhum agente — ao contrário de
 `casos-lab-06-v2.csv` (D02), que já tem `analise_baseline.md` com a métrica
@@ -56,14 +56,14 @@ aconteceu com `casos-lab-06-v2.csv` — ver nota na FONTE daquele lote).
 
 ```powershell
 .venv\Scripts\python.exe -m ams.gerador_casos `
-  --saida-casos D03\casos-gerados\casos-d03-lote1.csv `
-  --saida-depara D03\casos-gerados\depara-casos-d03-lote1.csv `
+  --saida-casos data\casos-gerados\casos-d03-lote1.csv `
+  --saida-depara data\casos-gerados\depara-casos-d03-lote1.csv `
   --excluir-depara D02\D2-06-agente-baseline\adaptacao-ams\depara-casos-lab-06-v2.csv `
   --prefixo B --data-inicio 2026-05-01 --seed 42
 ```
 
 Pra um próximo lote (ex.: D04), passe também `--excluir-depara
-D03\casos-gerados\depara-casos-d03-lote1.csv` além do de-para do lab-06,
+data\casos-gerados\depara-casos-d03-lote1.csv` além do de-para do lab-06,
 pra nunca reusar UDI de nenhum lote anterior.
 
 ## Licença e reúso

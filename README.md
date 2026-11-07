@@ -82,7 +82,8 @@ validação, mesmo log. O detalhe de cada avaliação fica em
 ├── data/
 │   ├── raw/               # baixado (fora do Git, regenerado pelo script)
 │   ├── amostra/           # 200 linhas versionadas — o projeto roda sem download
-│   └── fixtures/          # respostas gravadas do modelo (modo sem rede)
+│   ├── fixtures/          # respostas gravadas do modelo (modo sem rede)
+│   └── casos-gerados/     # lotes de casos novos, gerados por `ams.gerador_casos`
 ├── receitas/              # download dos datasets dos demais domínios do curso
 └── tests/                 # pytest — tudo sem rede
 ```
