@@ -53,8 +53,8 @@ def descida(x, y, taxa=0.1, passos=200, semente=42):
     perdas = []                                   # encanamento do laboratório
     for _ in range(passos):
         erro = (w * x + b) - y            # resíduo
-        dw = ...                          # TAREFA 1 — a derivada em w (slide 9)
-        db = ...                          # TAREFA 2 — a derivada em b (slide 9)
+        dw = 2 * np.mean(erro * x)        # TAREFA 1 — a derivada em w (slide 9)
+        db = 2 * np.mean(erro)            # TAREFA 2 — a derivada em b (slide 9)
         w, b = w - taxa * dw, b - taxa * db
         with np.errstate(over="ignore", invalid="ignore"):
             perdas.append(float(np.mean(erro ** 2)))  # encanamento: a curva
