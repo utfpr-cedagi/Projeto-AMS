@@ -67,6 +67,23 @@ desgaste acumulado). `LIMITE_VIBRACAO = 7.0` foi mantido, porque a faixa
 do proxy derivado já cai nessa escala por construção. Justificativa
 completa e números da medição em `RESUMO-LAB06.md` §5.
 
+## De-para (reconstruído)
+
+Este lote foi montado por amostragem manual (ver tabela de UDIs acima),
+sem gravar um de-para linha-a-linha na época. O arquivo
+`depara-casos-lab-06-v2.csv` (uma linha por `id_caso`, com UDI, `product_id`,
+categoria e mecanismo) foi reconstruído depois, por casamento de colunas
+contra `data/raw/ai4i2020.csv` (`tipo_maquina`, `temperatura_c`,
+`horas_desde_manutencao`, `falhou_depois`) — os 9 casos "difíceis"/"atípicos"
+batem direto com os UDIs já documentados acima; os 21 restantes exigiram
+desambiguação por busca combinatória sobre a fórmula de `vibracao_mm_s`
+(ela depende da mediana de RPM/torque das 30 linhas, então o UDI certo é o
+único que reproduz exatamente os valores gravados no CSV — erro 0,0 em
+todas as 30 linhas, o que confirma a reconstrução). Lotes gerados depois
+deste (ver `D03/casos-gerados/`) usam `ams.gerador_casos`, que grava o
+de-para automaticamente — essa reconstrução manual não deve ser necessária
+de novo.
+
 ## Licença e reúso
 
 Mesma licença do dataset original: CC BY 4.0 (AI4I 2020 Predictive
