@@ -51,8 +51,9 @@ extras-pessoal/obsidian/
   atualize-o quando um lab novo preencher uma seção.
 - `decisoes/` é só manual (o script nunca toca); notas novas lá podem ser
   escritas pelo `ams-documentador` a partir das lições dos `CLAUDE.md`.
-- `.obsidian/`: só `app.json` e `graph.json` são versionados; `workspace*.json`
-  está no `.gitignore`.
+- `.obsidian/`: só `app.json`, `appearance.json` e `core-plugins.json` são
+  versionados; `graph.json` (o app regrava a cada abertura) e `workspace*.json`
+  estão no `.gitignore`.
 
 ## Ao terminar
 

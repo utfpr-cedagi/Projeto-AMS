@@ -38,7 +38,8 @@ desktop.ini
 # Claude Code — config pessoal (agentes/skills em .claude/ SÃO versionados)
 .claude/settings.local.json
 
-# Obsidian — só app.json/graph.json do vault são versionados
+# Obsidian — graph.json é regravado pelo app a cada abertura; só app.json/appearance/core-plugins são versionados
+extras-pessoal/obsidian/.obsidian/graph.json
 extras-pessoal/obsidian/.obsidian/workspace*.json
 extras-pessoal/obsidian/.obsidian/cache
 extras-pessoal/obsidian/.trash/
