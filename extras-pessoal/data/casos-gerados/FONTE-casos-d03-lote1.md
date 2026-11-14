@@ -36,13 +36,40 @@ nenhum dos dois lotes compartilha um UDI de origem.
 
 ## Mapeamento de colunas
 
-Idêntico ao do lab-06-v2 (ver a tabela na FONTE daquele lote) —
-`tipo_maquina`/`temperatura_c`/`horas_desde_manutencao`/`falhou_depois`
-são reais; `idade_meses` é placeholder fixo `0`; `vibracao_mm_s` é o
-mesmo proxy derivado de desvio relativo de RPM/torque, calculado sobre a
+Parcialmente diferente do lab-06-v2 a partir de 2026-11-14 (ver seção
+seguinte) — `temperatura_c`/`horas_desde_manutencao`/`falhou_depois` são
+reais; `qualidade_produto` é real (`Type` do AI4I, L/M/H); `tipo_maquina`
+é **fictícia**, sorteada (ver seção seguinte); `vibracao_mm_s` é o mesmo
+proxy derivado de desvio relativo de RPM/torque, calculado sobre a
 mediana **deste** lote de 30 (não a do lab-06-v2); `data` é sequência
 sintética de 1 caso/dia a partir de `2026-05-01`, embaralhada entre
-categorias.
+categorias. `idade_meses` foi removida (ver seção seguinte).
+
+## Por que `tipo_maquina` muda de significado a partir deste lote
+
+Ajuste feito em 2026-11-14, por orientação do professor (e-mail "Casos
+para atividades D03"): em `casos-lab-06-v2.csv` (D02, já entregue e
+avaliado), `tipo_maquina` é preenchida com `Type` real do AI4I (L/M/H) —
+qualidade do produto, não família de máquina. Esse lote (e os seguintes,
+gerados por `gerador_casos.py`) corrige isso de verdade, sem inventar
+dado sem lastro: `tipo_maquina` passa a ser uma família fictícia
+(TORNO/PRENSA/COMPRESSOR/ROBOT), sorteada com seed fixa — o mesmo padrão
+didático que o próprio professor já usa na reserva sintética do pacote
+(`D02/D2-06-agente-baseline/casos-de-reserva.csv`, ver `FONTE.md` daquela
+pasta). A qualidade real do produto não se perde: passa a ter coluna
+própria, `qualidade_produto`.
+
+`idade_meses` também foi removida: era sempre `0` (nenhum campo real do
+AI4I corresponde a ela, e `decidir()` nunca a lia), então preencher sem
+lastro não era melhor do que não ter a coluna.
+
+`casos-lab-06-v2.csv` (D02) **não foi alterado** — mudar o nome/conteúdo
+daquela coluna quebraria `D02/D2-06-agente-baseline/esqueleto.py`
+(carregado pelo `carregar_casos()` do pacote do professor, não editável)
+e invalidaria a reprodutibilidade do resultado já avaliado da N2 (21/30).
+Quem comparar os dois lotes deve saber: em `casos-lab-06-v2.csv`,
+`tipo_maquina` = qualidade do produto; aqui em diante, `tipo_maquina` =
+família fictícia e `qualidade_produto` = qualidade real.
 
 ## De-para (obrigatório, gerado junto)
 

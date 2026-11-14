@@ -44,3 +44,12 @@ local já documenta a procedência — nos dois casos vistos até agora, os
 vetores `manutencao-*`/`generico-*` vieram pré-calculados do pacote da
 disciplina (não foram gerados pelo autor), então `dados/` inteira é do
 curso, igual ao resto do lab.
+
+`D03/AO1/dados/` é o primeiro caso diferente: a AO1 não tem pacote de
+curso (só o `enunciado.pdf` do professor), então todo o conteúdo de
+`dados/` ali é produção própria — os 60 casos de avaliação (30 de D02
+adaptados ao esquema novo de `tipo_maquina`/`qualidade_produto` + os 30
+novos de D03) e o de-para combinado, gerados por
+`extras-pessoal/scripts/adaptar_casos_lab06.py`. Ver
+`D03/AO1/dados/FONTE.md` para a proveniência completa e por que o
+arquivo original de D02 (`casos-lab-06-v2.csv`) não foi tocado.

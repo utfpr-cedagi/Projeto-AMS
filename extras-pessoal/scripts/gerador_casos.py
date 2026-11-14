@@ -36,6 +36,14 @@ HDF_LIMITE_ROTACAO = 1380  # rpm — falha se rotação < limite (as DUAS condi�
 PWF_FAIXA_SEGURA = (3500.0, 9000.0)  # W — falha se potência FORA desta faixa
 OSF_LIMITES = {"L": 11000.0, "M": 12000.0, "H": 13000.0}  # min·Nm, por tipo de máquina
 
+# Família de máquina: o AI4I2020 não tem essa variável (só a qualidade do
+# produto, L/M/H). Mesma solução didática que o professor já usou na
+# reserva sintética do pacote (`D02/D2-06-agente-baseline/casos-de-reserva.csv`,
+# ver `FONTE.md` daquela pasta): uma família fictícia, sorteada com seed
+# fixa, só para a coluna `tipo_maquina` representar o que o nome promete.
+# A qualidade real do produto (`Type`/L-M-H) vai à parte, em `qualidade_produto`.
+FAMILIAS_MAQUINA = ["TORNO", "PRENSA", "COMPRESSOR", "ROBOT"]
+
 # Margens usadas só para achar os casos "difíceis" (perto do gatilho, sem cruzá-lo).
 MARGEM_DIFICIL_HDF_DELTA = 1.0  # K acima do limite de delta
 MARGEM_DIFICIL_HDF_ROTACAO = 100.0  # rpm acima do limite de rotação
@@ -53,7 +61,7 @@ DISTRIBUICAO_FALHA_FACIL_PADRAO = {
 N_SEGURA_PADRAO = 16
 
 COLUNAS_CASO = [
-    "id_caso", "data", "tipo_maquina", "idade_meses", "temperatura_c",
+    "id_caso", "data", "tipo_maquina", "qualidade_produto", "temperatura_c",
     "vibracao_mm_s", "horas_desde_manutencao", "acao_correta",
     "falhou_depois", "risco", "dificuldade",
 ]
@@ -247,6 +255,11 @@ def gerar_lote(
     datas = [data_inicio + timedelta(days=i) for i in range(n_total)]
     rng.shuffle(datas)
 
+    # Sorteada depois de todos os outros usos de `rng` acima (UDIs por
+    # categoria, embaralhamento de datas): inserir aqui garante que nenhum
+    # valor já existente muda, só a coluna nova é afetada.
+    familia_maquina = rng.choice(FAMILIAS_MAQUINA, size=n_total)
+
     risco_dificuldade = linhas["categoria"].map(_RISCO_E_DIFICULDADE_POR_CATEGORIA)
     risco = risco_dificuldade.map(lambda par: par[0])
     dificuldade = risco_dificuldade.map(lambda par: par[1])
@@ -254,8 +267,8 @@ def gerar_lote(
     casos = pd.DataFrame({
         "id_caso": [f"{prefixo}{i + 1:02d}" for i in range(n_total)],
         "data": [d.isoformat() for d in datas],
-        "tipo_maquina": linhas["tipo"].astype(str).to_numpy(),
-        "idade_meses": 0,
+        "tipo_maquina": familia_maquina,
+        "qualidade_produto": linhas["tipo"].astype(str).to_numpy(),
         "temperatura_c": (linhas["temperatura_processo"] - 273.15).round(1).to_numpy(),
         "vibracao_mm_s": vibracao.to_numpy(),
         "horas_desde_manutencao": linhas["desgaste"].astype(float).to_numpy(),

@@ -100,15 +100,14 @@ def decidir(registro: dict, estado: EstadoDaFrota) -> str:
 def carregar_casos(caminho: str | Path) -> list[dict]:
     """Lê um CSV de casos rotulados, em ordem cronológica — a ordem
     importa porque o estado interno se acumula caso a caso. Espera as
-    colunas: id_caso, data, tipo_maquina, idade_meses, temperatura_c,
-    vibracao_mm_s, horas_desde_manutencao, acao_correta, falhou_depois.
+    colunas: id_caso, data, tipo_maquina, temperatura_c, vibracao_mm_s,
+    horas_desde_manutencao, acao_correta, falhou_depois.
     encoding utf-8-sig: tolera o BOM que o Excel costuma gravar.
     """
     with Path(caminho).open(encoding="utf-8-sig", newline="") as arquivo:
         casos = list(csv.DictReader(arquivo))
     casos.sort(key=lambda registro: registro["data"])
     for registro in casos:
-        registro["idade_meses"] = int(registro["idade_meses"])
         registro["temperatura_c"] = float(registro["temperatura_c"])
         registro["vibracao_mm_s"] = float(registro["vibracao_mm_s"])
         registro["horas_desde_manutencao"] = float(registro["horas_desde_manutencao"])
@@ -118,10 +117,11 @@ def carregar_casos(caminho: str | Path) -> list[dict]:
 
 def medir(caminho: str | Path) -> dict:
     """Roda o agente sobre os casos rotulados e devolve a métrica primária
-    do PEAS (`agent-spec.md` §4: recall da classe "alto" —
-    `parar_para_manutencao`), mais precisão da classe "alto" e acerto
-    geral como secundárias. É o critério de aceite do Laboratório 06:
-    "baseline.py roda sobre 30 casos e devolve a métrica primária".
+    do PEAS (`agent-spec.md` §4: acerto geral — valor 0/1 por caso,
+    compatível com o `acertos.csv` da AO1), mais recall e precisão da
+    classe "alto" (`parar_para_manutencao`) como secundárias. É o critério
+    de aceite do Laboratório 06: "baseline.py roda sobre 30 casos e
+    devolve a métrica primária".
 
     Returns:
         Dicionário com `recall_alto`, `precisao_alto`, `acerto_geral`,
@@ -153,7 +153,7 @@ def medir(caminho: str | Path) -> dict:
         estado.registrar_desfecho(registro)
     total = len(casos)
     return {
-        "metrica_primaria": "recall da classe alto",
+        "metrica_primaria": "acerto geral",
         "recall_alto": acertos_alto / reais_alto if reais_alto else 0.0,
         "precisao_alto": acertos_alto / presos_alto if presos_alto else 0.0,
         "acerto_geral": acertos / total if total else 0.0,
