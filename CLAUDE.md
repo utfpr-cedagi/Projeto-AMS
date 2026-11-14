@@ -96,11 +96,13 @@ abre PR pra lá.
    fora de `D0X/`, como seções novas do `agent-spec.md` — caso a caso).
 4. Remova explicitamente o que não deve ir (o `checkout -- path` não apaga
    sozinho o que falta no destino): `CLAUDE.md`/`D0X/CLAUDE.md`,
-   anotações de trabalho já aplicadas e obsoletas, `pyproject.toml`/
+   `.claude/` (agentes e skills), anotações de trabalho já aplicadas e obsoletas, `pyproject.toml`/
    `uv.lock` e qualquer mudança em `scripts/`/`README.md` que só fale de
    `uv`.
 5. Confira com `git status` / `git diff --cached --stat` antes de commitar.
 6. Abra o PR de `entrega/D0X_EY` para `main`.
+
+A skill `/entrega D0X_EY` executa os passos 1–5 e para antes do commit.
 
 Nunca faça merge de `main` em `uv-setup` — são linhas de história
 separadas de propósito (`uv-setup` carrega a migração; `main` não).
@@ -108,6 +110,26 @@ separadas de propósito (`uv-setup` carrega a migração; `main` não).
 `entrega/D02` foi o caso retroativo: cobriu a disciplina inteira de uma vez
 (D2-01 a D2-09), já que esse padrão por encontro só passou a valer a partir
 da D3.
+
+## Agentes e skills (`.claude/`)
+
+Versionados como o `CLAUDE.md` (viajam em `feature/*` e `uv-setup`, saem
+na entrega). Ficaram como **agente** os papéis que pedem conhecimento
+especializado com contexto próprio, e como **skill** os procedimentos de
+passos fixos.
+
+| Nome | Tipo | Papel |
+|---|---|---|
+| `ams-dominio` | agente, leitura | Domínio (NRs, LOTO, risco) + o que já foi decidido no projeto |
+| `ams-dataset` | agente, roda Python | AI4I 2020, amostra/raw, casos gerados, estatística |
+| `ams-documentador` | agente, escreve | `agent-spec.md`, CLAUDE.md, README, FONTE.md, vault |
+| `ams-critico` | agente, leitura + testes | Revisão antes de fechar lab / abrir entrega |
+| `ams-tutor` | agente, leitura | Socrático: explica conceito sem resolver o lab |
+| `/entrega D0X_EY` | skill | Fluxo de entrega para `main`, para antes do commit |
+| `/obsidian-sync` | skill | Vault em `extras-pessoal/obsidian/` (commits, labs, spec, links) |
+
+O "melhorador de prompt" não virou agente: é uma regra da memória do
+Claude (reformular o pedido antes de executar), que já roda em toda conversa.
 
 ## Lições aprendidas e convenções por disciplina
 
