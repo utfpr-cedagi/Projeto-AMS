@@ -29,6 +29,8 @@ Detalhes completos em [`dominio.md`](dominio.md).
   (ferramenta pessoal pra gerar lotes de casos rotulados, não original do
   curso — por isso fora de `src/ams/`, com teste próprio rodado à parte,
   fora da suíte oficial) e `data/casos-gerados/` (lotes gerados por ele).
+  Também tem o vault Obsidian em `obsidian/` (abra essa pasta no app),
+  gerado por `scripts/gerar_vault.py` via skill `/obsidian-sync`.
 - `data/` — `amostra/` (200 linhas versionadas) e `fixtures/` (respostas do
   modelo gravadas p/ modo offline) são versionados; `raw/` não é.
 - `tests/` — pytest sobre `src/ams`, nunca toca rede (76 testes).

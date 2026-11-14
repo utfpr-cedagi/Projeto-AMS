@@ -40,11 +40,22 @@ extras-pessoal/obsidian/
 - **Branches:** quais commits são exclusivos, de onde nasceu (seguindo a
   convenção do `CLAUDE.md`).
 - Tags: `#disciplina/D03`, `#lab`, `#spec`, `#commit`, `#decisao`.
-- Use uma script Python temporária no scratchpad da sessão para gerar as
-  notas de commit (volume grande); escreva as notas de síntese (índice,
-  disciplinas, spec) com cuidado, à mão.
+- **Gerador fixo:** tudo acima é feito por
+  `extras-pessoal/scripts/gerar_vault.py` (versionado). Rode
+  `.venv\Scripts\python.exe extras-pessoal\scripts\gerar_vault.py --dry-run`
+  primeiro e depois sem `--dry-run`. Não reescreva notas na mão nem com
+  script temporário: se a geração precisar mudar, mude o script.
+- Texto abaixo da linha `<!-- manual -->` de uma nota gerada é preservado
+  pelo script — é ali que vão comentários à mão em notas de lab/spec/commit.
+- O mapa seção do spec → lab fica no dicionário `SPEC_PARA_LAB` do script;
+  atualize-o quando um lab novo preencher uma seção.
+- `decisoes/` é só manual (o script nunca toca); notas novas lá podem ser
+  escritas pelo `ams-documentador` a partir das lições dos `CLAUDE.md`.
+- `.obsidian/`: só `app.json` e `graph.json` são versionados; `workspace*.json`
+  está no `.gitignore`.
 
 ## Ao terminar
 
-Informe quantas notas foram criadas, atualizadas e mantidas (manuais), e
+Repasse o relatório do script (criadas, atualizadas, sem mudança, manuais,
+órfãs — órfãs nunca são apagadas automaticamente; pergunte ao autor) e
 sugira um commit separado só para o vault.
