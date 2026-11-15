@@ -102,12 +102,18 @@ def carregar_casos(caminho: str | Path) -> list[dict]:
     importa porque o estado interno se acumula caso a caso. Espera as
     colunas: id_caso, data, tipo_maquina, temperatura_c, vibracao_mm_s,
     horas_desde_manutencao, acao_correta, falhou_depois.
+    `idade_meses` é OPCIONAL: existe no esquema da D2 (casos-lab-06-v2.csv,
+    reserva do professor) e saiu no esquema da D3 (casos-60.csv da AO1).
+    Se a coluna vier preenchida, é convertida para int; se não vier, o
+    caso é lido igual — a regra de decisão não usa a idade.
     encoding utf-8-sig: tolera o BOM que o Excel costuma gravar.
     """
     with Path(caminho).open(encoding="utf-8-sig", newline="") as arquivo:
         casos = list(csv.DictReader(arquivo))
     casos.sort(key=lambda registro: registro["data"])
     for registro in casos:
+        if registro.get("idade_meses") not in (None, ""):
+            registro["idade_meses"] = int(registro["idade_meses"])
         registro["temperatura_c"] = float(registro["temperatura_c"])
         registro["vibracao_mm_s"] = float(registro["vibracao_mm_s"])
         registro["horas_desde_manutencao"] = float(registro["horas_desde_manutencao"])

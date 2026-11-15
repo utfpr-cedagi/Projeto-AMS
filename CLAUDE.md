@@ -33,7 +33,7 @@ Detalhes completos em [`dominio.md`](dominio.md).
   gerado por `scripts/gerar_vault.py` via skill `/obsidian-sync`.
 - `data/` — `amostra/` (200 linhas versionadas) e `fixtures/` (respostas do
   modelo gravadas p/ modo offline) são versionados; `raw/` não é.
-- `tests/` — pytest sobre `src/ams`, nunca toca rede (76 testes).
+- `tests/` — pytest sobre `src/ams`, nunca toca rede (78 testes).
 - [`agent-spec.md`](agent-spec.md) — **documento vivo**: cresce uma seção
   por laboratório/disciplina (PEAS, dimensões do ambiente, tipo de agente,
   formulação por busca, ...). É o principal artefato de entrega do curso —
@@ -58,7 +58,7 @@ Detalhes completos em [`dominio.md`](dominio.md).
 ```powershell
 .venv\Scripts\python.exe scripts\baixar-dados.py      # baixa o dataset (opcional — já tem amostra)
 .venv\Scripts\python.exe -m ams.cliente_llm            # avalia 20 ordens de serviço
-.venv\Scripts\python.exe -m pytest                     # 76 testes, sem rede
+.venv\Scripts\python.exe -m pytest                     # 78 testes, sem rede
 uvicorn ams.api:app --reload                            # API local, /docs
 ```
 
