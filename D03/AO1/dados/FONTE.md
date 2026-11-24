@@ -24,7 +24,7 @@ inteiramente produção própria por natureza.
   entre as duas metades (o lote1 foi gerado excluindo explicitamente os
   UDIs de D02).
 
-Pedido do professor (anotações de aula, D03/AO1): copiar os 30 casos já
+**Pedido do professor (anotações de aula, D03/AO1):** copiar os 30 casos já
 usados na D2 e somar mais 30, totalizando 60, para a avaliação da AO1
 (arquivo `acertos.csv` dos laboratórios 05/06).
 
