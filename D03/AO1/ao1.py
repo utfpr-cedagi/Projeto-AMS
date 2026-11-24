@@ -1,6 +1,7 @@
 """AO1 da D3: compara a linha de base (A) com a variante B nos mesmos 60 casos.
 
-Adaptado do arquivo de apoio do professor (`apoio-professor/ao1.py`).
+Adaptado do arquivo de apoio que o professor distribuiu (Moodle, fora deste
+repositório).
 Rode com o .venv do projeto, de qualquer pasta:
     .venv\\Scripts\\python.exe D03\\AO1\\ao1.py
 ou, de dentro do notebook `03-estatistica.ipynb`, com `%run ao1.py`.

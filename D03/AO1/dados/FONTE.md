@@ -17,12 +17,14 @@ inteiramente produção própria por natureza.
   (ver `FONTE-casos-lab-06-v2.md` naquela pasta para a proveniência
   completa — categorias, UDIs, fórmulas). **O arquivo original de D02 não
   foi alterado.**
-- **Casos B01–B30** (maio/2026): os 30 casos novos gerados por
-  `extras-pessoal/scripts/gerador_casos.py` em
-  `extras-pessoal/data/casos-gerados/casos-d03-lote1.csv` (ver
-  `FONTE-casos-d03-lote1.md` naquela pasta). Nenhum UDI real se repete
-  entre as duas metades (o lote1 foi gerado excluindo explicitamente os
-  UDIs de D02).
+- **Casos B01–B30** (maio/2026): 30 casos novos, também tirados de
+  linhas reais do AI4I2020, gerados por um script pessoal do autor
+  (`gerador_casos.py`, lote `casos-d03-lote1.csv`). O script e o lote
+  ficam na área de estudo pessoal do autor, **fora desta entrega**; nesta
+  pasta os casos B01–B30 existem só dentro de `casos-60.csv`, e a
+  proveniência linha a linha (UDI de origem) está em `depara-60.csv`.
+  Nenhum UDI real se repete entre as duas metades (o lote foi gerado
+  excluindo explicitamente os UDIs de D02).
 
 **Pedido do professor (anotações de aula, D03/AO1):** copiar os 30 casos já
 usados na D2 e somar mais 30, totalizando 60, para a avaliação da AO1
@@ -42,7 +44,8 @@ Não dava pra corrigir isso no arquivo original de D02 — ele é lido pelo
 avaliado na N2 (21/30); mudar sua coluna/significado quebraria essa
 reprodutibilidade. A solução foi adaptar uma CÓPIA, só para a D03:
 
-- `extras-pessoal/scripts/adaptar_casos_lab06.py` lê
+- Um script pessoal do autor (`adaptar_casos_lab06.py`, fora desta
+  entrega, como o gerador) lê
   `casos-lab-06-v2.csv`, renomeia `tipo_maquina` → `qualidade_produto`
   (preserva o L/M/H real), sorteia uma `tipo_maquina` nova (família
   fictícia, mesma lista `FAMILIAS_MAQUINA` de `gerador_casos.py`:
@@ -54,21 +57,19 @@ reprodutibilidade. A solução foi adaptar uma CÓPIA, só para a D03:
   reais (data, temperatura, vibração, horas desde manutenção, ação
   correta, falha, risco, dificuldade) de `casos-lab-06-v2.csv`, só muda o
   que estava embutido em `tipo_maquina`/`idade_meses`.
-- Esse arquivo adaptado é então concatenado com uma cópia de
-  `casos-d03-lote1.csv` (copiada pra dentro de `D03/AO1/dados/` porque
-  precisa viajar na entrega da AO1 — `extras-pessoal/` nunca é copiado
-  pra uma branch `entrega/D0X_EY`) para formar `casos-60.csv`. O de-para
+- Esse arquivo adaptado é então concatenado com o lote
+  `casos-d03-lote1.csv` para formar `casos-60.csv` (o lote não tem cópia
+  à parte nesta pasta: os casos dele estão só dentro de `casos-60.csv`). O de-para
   das duas metades (`depara-casos-lab-06-v2.csv` + `depara-casos-d03-lote1.csv`)
   é concatenado da mesma forma em `depara-60.csv`.
 
 ## Como reproduzir
 
-```powershell
-.venv\Scripts\python.exe extras-pessoal\scripts\adaptar_casos_lab06.py
-```
-
-Determinístico (seed fixa) — roda de novo e gera os mesmos três arquivos,
-desde que `casos-lab-06-v2.csv` e `casos-d03-lote1.csv` não mudem.
+Os três arquivos desta pasta são o resultado final e já estão
+versionados; para usar a AO1 não é preciso gerá-los de novo. Os scripts
+que os geram (`gerador_casos.py` e `adaptar_casos_lab06.py`) são
+determinísticos (seeds fixas 42 e 99), mas ficam na área pessoal do
+autor, fora desta entrega.
 
 ## Nota sobre as datas
 
@@ -79,6 +80,14 @@ dentro do mês, herdadas de `casos-d03-lote1.csv`). Quem rodar
 bloco de abril inteiro antes de começar o de maio — `EstadoDaFrota` não
 mistura família/falha das duas metades num mesmo instante, mas acumula
 normalmente dentro de cada bloco.
+
+**Ordem das linhas em `acertos.csv`:** o `ao1.py` usa o mesmo
+`carregar_casos` (que ordena por `data`), então as linhas do
+`acertos.csv` seguem a **ordem de data**, não a ordem de `id_caso` de
+`casos-60.csv`. As linhas 1–30 coincidem (A01–A30 já estão em ordem de
+data); de B01 em diante não. Para cruzar um acerto com o seu caso,
+ordene `casos-60.csv` por `data` (as 60 datas são distintas) antes de
+alinhar por posição.
 
 ## Licença e reúso
 
