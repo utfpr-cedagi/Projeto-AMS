@@ -15,7 +15,7 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 -->
 
 **Domínio:** AMS · Assistente de Manutenção Segura
-**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-10-26
+**Autor(a):** DANIEL ALVES MARTINHAO · **Última revisão:** 2026-11-14
 
 ---
 
@@ -40,11 +40,11 @@ para qualquer empresa é uma linha genérica — o exemplo do seu segmento
 
 [a medida de desempenho com fórmula: sobre o quê se conta, sobre qual conjunto, quanto é sucesso]
 
-Medir se o modelo consegue identificar corretamente casos de máquinas com alto risco de falha. O objetivo é alcançar recall e precisão de pelo menos 80% para a classe “alto” e garantir que no máximo 5% dos casos realmente de alto risco sejam classificados como baixo.
+Medir se a decisão do agente coincide com a decisão correta do caso (acerto geral), com meta de pelo menos 80% — e, pra não deixar esse acerto médio esconder os casos mais graves, exigir recall e precisão de pelo menos 80% para a classe "alto" e garantir que no máximo 5% dos casos realmente de alto risco sejam classificados como baixo.
 
 | Intenção | Medida Opoeracional |
 |---|---|
-| Identificar possível falha iminente (risco baixo / médio / alto) | **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.` </br> </br> **Critério:** recall maior ou igual a 80%.  </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = quantidade de máquinas classificadas como alto que realmente eram de alto risco dividido pela quantidade total de máquinas classificadas como alto.` </br> </br> **Critério:** precisão maior ou igual a 80%. </br> </br> *Usando Recall em conjunto com Precision para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* </br></br> **Taxa de classificação como “baixo” dos casos que eram na verdade de alto risco:** proporção de máquinas que realmente apresentavam alto risco de falha, mas foram classificadas pelo agente como de baixo risco. </br> </br> **Fórmula:** `Taxa de erro = máquinas realmente de alto risco classificadas como baixo dividio total de máquinas realmente de alto risco.` </br></br> **Critério:** taxa menor ou igual a 5%. </br> </br>Essa medida controla especificamente os casos de alto risco classificados como baixo; os casos classificados como médio permanecem contabilizados no recall, mas não nessa taxa específica. |
+| Identificar possível falha iminente (risco baixo / médio / alto) | **Acerto geral**: proporção de casos em que a decisão do agente coincide com o rótulo correto, sobre o total de casos. </br> </br> **Fórmula:** `Acerto = quantidade de decisões corretas dividido pelo total de casos.` </br> </br> **Critério:** acerto maior ou igual a 80%. </br></br> **Recall da classe "alto" para risco de falha iminente**: proporção de máquinas que realmente apresentavam alto risco de falha e foram corretamente classificadas pelo agente como de alto risco. </br> </br> **Fórmula:** </br> `Recall = quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.` </br> </br> **Critério:** recall maior ou igual a 80%.  </br> </br> **Precisão da classe "alto" para risco de falha iminente**: proporção de máquinas classificadas pelo agente como de alto risco que realmente apresentavam alto risco de falha. </br> </br> **Fórmula**: `Precisão = quantidade de máquinas classificadas como alto que realmente eram de alto risco dividido pela quantidade total de máquinas classificadas como alto.` </br> </br> **Critério:** precisão maior ou igual a 80%. </br> </br> *Usando Recall em conjunto com Precision para eveitar um agente que responda alto para tudo e assim termos uma base de respostas sem sentido.* </br></br> **Taxa de classificação como “baixo” dos casos que eram na verdade de alto risco:** proporção de máquinas que realmente apresentavam alto risco de falha, mas foram classificadas pelo agente como de baixo risco. </br> </br> **Fórmula:** `Taxa de erro = máquinas realmente de alto risco classificadas como baixo dividio total de máquinas realmente de alto risco.` </br></br> **Critério:** taxa menor ou igual a 5%. </br> </br>Essa medida controla especificamente os casos de alto risco classificados como baixo; os casos classificados como médio permanecem contabilizados no recall, mas não nessa taxa específica. |
 
 **Environment:**
 
@@ -127,11 +127,12 @@ o que `EstadoDaFrota` guarda em `baseline.py`, e o que os 3 erros mais
 graves da linha de base (A07, A09, A18, em `analise_baseline.md`) mostram
 na prática: a máquina falhou sem que a leitura do momento acusasse nada.
 
-Mas "baseado em modelo" não basta. A medida de desempenho (§4) não é um
-teste de objetivo binário — ela pondera os erros de forma assimétrica: um
-falso "baixo" (máquina de risco alto liberada) é tratado como até 5x mais
-grave que os demais, com um limite próprio (≤5%) separado do recall geral.
-Avaliar qual decisão minimiza o custo esperado, e não apenas "bateu o
+Mas "baseado em modelo" não basta. Mesmo a primária (§4: acerto geral)
+sendo um valor 0/1 por caso, as secundárias pesam os erros de forma
+assimétrica: um falso "baixo" (máquina de risco alto liberada) tem um
+limite próprio (≤5%, Secundária 3), separado e bem mais apertado que a
+meta de recall da classe "alto" (≥80%, Secundária 1). Avaliar qual decisão
+minimiza o custo esperado, e não apenas "bateu o
 limiar", é função de utilidade — por isso o tipo mínimo que resolve é o
 agente baseado em utilidade.
 
@@ -156,7 +157,30 @@ Atividade Orientada.
 calcula, sobre qual conjunto, qual o limiar de sucesso e o
 valor de hoje]
 
-#### **Métrica primária — Recall da classe "alto"**
+<!--
+Reordenado em 2026-11-14, por orientação do professor (D03, e-mail
+"Casos para atividades D03 - Matemática e Estatística para IA"): na D3 a
+métrica primária precisa valer 0 ou 1 por caso, porque é isso que o
+`acertos.csv` da AO1/laboratórios compara — "acerto geral" é um valor por
+caso (acertou/não), "recall da classe alto" é agregado (só existe somado
+sobre vários casos), por isso não pode ser primária nessa estrutura. Os
+limiares de 80%/80%/5% abaixo são os valores já definidos desde D02 —
+mantidos por não termos recebido números novos, não reconfirmados pelo
+professor nesta troca. Note também: "recall geral" (média entre classes)
+foi cogitado e descartado nessa mesma troca — não é um valor por caso e
+não deve entrar em nenhum laboratório da D3.
+-->
+
+#### **Métrica Primária — Acerto geral**
+**Como se calcula:** quantidade de casos em que a decisão do agente coincide com o rótulo correto, dividido pelo total de casos — valor 0/1 por caso, compatível com o formato `acertos.csv` da AO1.
+
+**Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
+
+**Limiar de sucesso**: maior ou igual a 80%. Valor herdado da métrica anterior, não reconfirmado pelo professor — poderá ser ajustado ao receber uma definição clara sobre isso.
+
+**Valor de hoje**: não medido.
+
+#### **Métrica Secundária 1 — Recall da classe "alto"**
 **Como se calcula:** quantidade de máquinas realmente de alto risco, que foram classificadas como alto, dividido pela quantidade total de máquinas realmente de alto risco.
 
 **Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
@@ -165,7 +189,7 @@ valor de hoje]
 
 **Valor de hoje**: não medido.
 
-#### **Métrica Secundária 1 — Precisão da classe "alto"**
+#### **Métrica Secundária 2 — Precisão da classe "alto"**
 **Como se calcula:** quantidade de máquinas classificadas como alto que são de fato alto dividio pelo total classificado como alto.
 
 
@@ -175,7 +199,7 @@ valor de hoje]
 
 **Valor de hoje**: não medido.
 
-#### **Secundária 2 — Taxa de erro classificados com baixo e deveria ser alto**
+#### **Métrica Secundária 3 — Taxa de erro classificados com baixo e deveria ser alto**
 **Como se calcula:** máquinas de risco alto classificadas como baixo dividido pelo total de máquinas de risco alto.
 
 **Conjunto de dados**: dataset recebido periodicamente com ordens de servico.
